@@ -8,6 +8,14 @@ cc -o test-add1.exe test-add1.s printbig.o
 diff -b test-add1.out tests/test-add1.out > test-add1.diff
 ###### SUCCESS
 
+###### Testing test-and
+./microc.native tests/test-and.mc > test-and.ll
+llc -relocation-model=pic test-and.ll > test-and.s
+cc -o test-and.exe test-and.s printbig.o
+./test-and.exe
+diff -b test-and.out tests/test-and.out > test-and.diff
+###### SUCCESS
+
 ###### Testing test-arith1
 ./microc.native tests/test-arith1.mc > test-arith1.ll
 llc -relocation-model=pic test-arith1.ll > test-arith1.s
@@ -278,6 +286,14 @@ llc -relocation-model=pic test-ops2.ll > test-ops2.s
 cc -o test-ops2.exe test-ops2.s printbig.o
 ./test-ops2.exe
 diff -b test-ops2.out tests/test-ops2.out > test-ops2.diff
+###### SUCCESS
+
+###### Testing test-or
+./microc.native tests/test-or.mc > test-or.ll
+llc -relocation-model=pic test-or.ll > test-or.s
+cc -o test-or.exe test-or.s printbig.o
+./test-or.exe
+diff -b test-or.out tests/test-or.out > test-or.diff
 ###### SUCCESS
 
 ###### Testing test-printbig

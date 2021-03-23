@@ -1,4 +1,4 @@
-int gcd(int a, int b) {
+def int gcd(int a, int b) {
   while (a != b) {
     if (a > b) a = a - b;
     else b = b - a;
@@ -6,7 +6,7 @@ int gcd(int a, int b) {
   return a;
 }
 
-int main()
+def int main()
 {
   print(gcd(2,14));
   print(gcd(3,15));

@@ -1,4 +1,4 @@
-int foo(int a, bool b)
+def int foo(int a, bool b)
 {
   int c;
   bool d;
@@ -8,7 +8,7 @@ int foo(int a, bool b)
   return c + 10;
 }
 
-int main() {
+def int main() {
  print(foo(37, false));
  return 0;
 }

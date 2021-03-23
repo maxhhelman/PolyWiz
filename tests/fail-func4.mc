@@ -1,12 +1,12 @@
-int foo() {}
+def int foo() {}
 
-void bar() {}
+def void bar() {}
 
-int print() {} /* Should not be able to define print */
+def int print() {} /* Should not be able to define print */
 
-void baz() {}
+def void baz() {}
 
-int main()
+def int main()
 {
   return 0;
 }

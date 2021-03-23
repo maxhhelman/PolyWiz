@@ -1,4 +1,4 @@
-void testfloat(float a, float b)
+def void testfloat(float a, float b)
 {
   printf(a + b);
   printf(a - b);
@@ -14,7 +14,7 @@ void testfloat(float a, float b)
   printb(a <= b);
 }
 
-int main()
+def int main()
 {
   float c;
   float d;

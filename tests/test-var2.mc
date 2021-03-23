@@ -1,11 +1,11 @@
 int a;
 
-void foo(int c)
+def void foo(int c)
 {
   a = c + 42;
 }
 
-int main()
+def int main()
 {
   foo(73);
   print(a);

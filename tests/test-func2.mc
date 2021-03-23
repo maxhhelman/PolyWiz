@@ -1,11 +1,11 @@
 /* Bug noticed by Pin-Chin Huang */
 
-int fun(int x, int y)
+def int fun(int x, int y)
 {
   return 0;
 }
 
-int main()
+def int main()
 {
   int i;
   i = 1;

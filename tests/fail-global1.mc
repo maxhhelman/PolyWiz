@@ -3,7 +3,7 @@ bool b;
 void a; /* global variables should not be void */
 
 
-int main()
+def int main()
 {
   return 0;
 }

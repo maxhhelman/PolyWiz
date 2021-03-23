@@ -1,4 +1,4 @@
-int main()
+def int main()
 {
   print(42);
   print(71);

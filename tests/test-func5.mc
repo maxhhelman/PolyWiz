@@ -1,9 +1,9 @@
-int foo(int a)
+def int foo(int a)
 {
   return a;
 }
 
-int main()
+def int main()
 {
   return 0;
 }

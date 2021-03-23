@@ -1,10 +1,10 @@
-void foo()
+def void foo()
 {
   if (true) return 42; /* Should return void */
   else return;
 }
 
-int main()
+def int main()
 {
   return 42;
 }

@@ -1,4 +1,4 @@
-int main()
+def int main()
 {
   float a;
   float b;

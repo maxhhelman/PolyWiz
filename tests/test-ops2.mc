@@ -1,4 +1,4 @@
-int main()
+def int main()
 {
   printb(true);
   printb(false);

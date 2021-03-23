@@ -1,4 +1,4 @@
-int main()
+def int main()
 {
   float a;
   a = 3.14159267;

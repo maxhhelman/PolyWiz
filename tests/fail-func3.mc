@@ -1,8 +1,8 @@
-int foo(int a, bool b, int c) { }
+def int foo(int a, bool b, int c) { }
 
-void bar(int a, void b, int c) {} /* Error: illegal void formal b */
+def void bar(int a, void b, int c) {} /* Error: illegal void formal b */
 
-int main()
+def int main()
 {
   return 0;
 }

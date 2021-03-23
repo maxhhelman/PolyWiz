@@ -1,6 +1,6 @@
 bool i;
 
-int main()
+def int main()
 {
   int i; /* Should hide the global i */
 

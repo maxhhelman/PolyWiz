@@ -1,4 +1,4 @@
-int foo(int a)
+def int foo(int a)
 {
   int j;
   j = 0;
@@ -9,7 +9,7 @@ int foo(int a)
   return j;
 }
 
-int main()
+def int main()
 {
   print(foo(7));
   return 0;

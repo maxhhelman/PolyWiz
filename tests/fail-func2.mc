@@ -1,8 +1,8 @@
-int foo(int a, bool b, int c) { }
+def int foo(int a, bool b, int c) { }
 
-void bar(int a, bool b, int a) {} /* Error: duplicate formal a in bar */
+def void bar(int a, bool b, int a) {} /* Error: duplicate formal a in bar */
 
-int main()
+def int main()
 {
   return 0;
 }

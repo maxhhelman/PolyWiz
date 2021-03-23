@@ -1,2 +1,2 @@
 /* Should be illegal to redefine */
-void printbig() {}
+def void printbig() {}

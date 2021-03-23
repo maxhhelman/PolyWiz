@@ -1,6 +1,6 @@
-int foo() {}
+def int foo() {}
 
-int bar() {
+def int bar() {
   int a;
   void b; /* Error: illegal void local b */
   bool c;
@@ -8,7 +8,7 @@ int bar() {
   return 0;
 }
 
-int main()
+def int main()
 {
   return 0;
 }

@@ -1,4 +1,4 @@
-int cond(bool b)
+def int cond(bool b)
 {
   int x;
   if (b)
@@ -8,7 +8,7 @@ int cond(bool b)
   return x;
 }
 
-int main()
+def int main()
 {
  print(cond(true));
  print(cond(false));

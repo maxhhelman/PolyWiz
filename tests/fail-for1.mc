@@ -1,4 +1,4 @@
-int main()
+def int main()
 {
   int i;
   for ( ; true ; ) {} /* OK: Forever */

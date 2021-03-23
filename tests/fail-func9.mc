@@ -1,8 +1,8 @@
-void foo(int a, bool b)
+def void foo(int a, bool b)
 {
 }
 
-int main()
+def int main()
 {
   foo(42, true);
   foo(42, 42); /* Fail: int, not bool */

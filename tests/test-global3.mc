@@ -2,7 +2,7 @@ int i;
 bool b;
 int j;
 
-int main()
+def int main()
 {
   i = 42;
   j = 10;

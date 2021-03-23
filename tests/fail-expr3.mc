@@ -1,14 +1,14 @@
 int a;
 float b;
 
-void foo(int c, float d)    
+def void foo(int c, float d)    
 {
   int d;
   float e;
   b + a; /* Error: float + int */
 }
 
-int main()
+def int main()
 {
   return 0;
 }

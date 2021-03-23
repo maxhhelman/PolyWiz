@@ -10,8 +10,8 @@ def int main()
   printb(true or false);
   printb(false or true);
   printb(false or false);
-  printb(!false);
-  printb(!true);
+  printb(not false);
+  printb(not true);
   print(-10);
   print(--42);
 }

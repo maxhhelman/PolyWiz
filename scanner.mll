@@ -27,7 +27,7 @@ rule token = parse
 | ">="     { GEQ }
 | "and"     { AND }
 | "or"     { OR }
-| "!"      { NOT }
+| "not"      { NOT }
 | "if"     { IF }
 | "else"   { ELSE }
 | "for"    { FOR }

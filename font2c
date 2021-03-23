@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Assumes the .pbm file was created from GIMP using the "Raw" output mode
+
+# Generates C-like source code for a font that's easily added to a .c file
+
+tail -n +4 arcade-font.pbm | od --output-duplicates --width=8 --format=x1 --address-radix=n | sed "s/^ /0x/
+s/ /, 0x/g
+s/$/,/"

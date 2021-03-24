@@ -63,11 +63,12 @@ let translate (globals, functions) =
   let printbig_func : L.llvalue =
       L.declare_function "printbig" printbig_t the_module in
   (* Print strings *)
+  (*
   let printstr_t : L.lltype =
       L.function_type string_t [| L.pointer_type i8_t |] in
   let printstr_func : L.llvalue =
       L.declare_function "printstr" printstr_t the_module in
-
+  *)
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =

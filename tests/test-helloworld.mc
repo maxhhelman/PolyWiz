@@ -1,4 +1,4 @@
 def int main(){
- printstr("Hello world!");
+ printstr("Hello World");
  return 0;
 }

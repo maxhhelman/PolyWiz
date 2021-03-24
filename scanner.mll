@@ -1,6 +1,6 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for PolyWiz *)
 
-{ open Microcparse }
+{ open Polywizparse }
 
 let digit = ['0' - '9']
 let digits = digit+

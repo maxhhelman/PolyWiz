@@ -3,6 +3,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 /*
  * Font information: one byte per row, 8 rows per character
@@ -62,6 +64,40 @@ void printbig(int c)
     }
     putchar('\n');
   } while (index & 0x7); 
+}
+
+double pow_operator_ff(double a, double b){
+  /*return (double) pow(a,b);*/
+  return a*b;
+}
+
+double pow_operator_fi(double a, int b){
+  /*return (double) pow(a,b);*/
+  return a*b;
+}
+
+double pow_operator_if(int a, double b){
+  /*return (double) pow(a,b);*/
+  return a*b;
+}
+
+int pow_operator_ii(int a, int b){
+  /*return (int) pow(a,b);*/
+  return a*b;
+}
+
+double abs_operator_float(double a){
+  if(a<0){
+    return -1.0 * a;
+  }
+  return a;
+}
+
+int abs_operator_int(int a){
+  if(a<0){
+    return -1*a;
+  }
+  return a;
 }
 
 

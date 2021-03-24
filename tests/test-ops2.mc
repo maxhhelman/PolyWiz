@@ -14,4 +14,6 @@ def int main()
   printb(not true);
   print(-10);
   print(--42);
+  printf(2.0 ^ 2.0);
+  printf(|-2.0|);
 }

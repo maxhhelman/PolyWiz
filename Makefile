@@ -26,10 +26,9 @@ microc.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff
+	rm -rf testall.log ocamlllvm *.diff *.o
 
 # Testing the "printbig" example
-
 printbig : printbig.c
 	cc -o printbig -DBUILD_TEST printbig.c
 

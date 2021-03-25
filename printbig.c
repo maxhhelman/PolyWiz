@@ -2,10 +2,11 @@
  *  A function illustrating how to link C code to code generated from LLVM 
  */
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
-
+//#include "printbig.h"
+//#ifdef BUILD_TEST
 /*
  * Font information: one byte per row, 8 rows per character
  * In order, space, 0-9, A-Z
@@ -67,43 +68,33 @@ void printbig(int c)
 }
 
 double pow_operator_ff(double a, double b){
-  /*return (double) pow(a,b);*/
-  return a*b;
+  return pow(a, b);
 }
 
 double pow_operator_fi(double a, int b){
-  /*return (double) pow(a,b);*/
-  return a*b;
+  return pow(a, (double) b);
 }
 
 double pow_operator_if(int a, double b){
-  /*return (double) pow(a,b);*/
-  return a*b;
+  return pow((double) a,b);
 }
 
 int pow_operator_ii(int a, int b){
-  /*return (int) pow(a,b);*/
-  return a*b;
+  return (int) pow((double) a, (double) b);
 }
 
 double abs_operator_float(double a){
-  if(a<0){
-    return -1.0 * a;
-  }
-  return a;
+  return fabs(a);
 }
 
 int abs_operator_int(int a){
-  if(a<0){
-    return -1*a;
-  }
-  return a;
+  return abs(a);
 }
-
 
 #ifdef BUILD_TEST
 int main()
 {
+  double a = pow(1.0, 2.0);
   char s[] = "HELLO WORLD09AZ";
   char *c;
   for ( c = s ; *c ; c++) printbig(*c);

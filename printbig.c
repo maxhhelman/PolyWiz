@@ -1,5 +1,5 @@
 /*
- *  A function illustrating how to link C code to code generated from LLVM 
+ *  A function illustrating how to link C code to code generated from LLVM
  */
 
 #include <stdio.h>
@@ -63,7 +63,7 @@ void printbig(int c)
       putchar(d); putchar(d);
     }
     putchar('\n');
-  } while (index & 0x7); 
+  } while (index & 0x7);
 }
 
 double pow_operator_ff(double a, double b){

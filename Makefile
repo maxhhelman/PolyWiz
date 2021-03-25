@@ -8,7 +8,7 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : polywiz.native printbig.o
+all : polywiz.native printbig
 
 # "make polywiz.native" compiles the compiler
 #
@@ -26,11 +26,11 @@ polywiz.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.o
+	rm -rf testall.log printbig ocamlllvm *.diff *.o
 
 # Testing the "printbig" example
-printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
+printbig : printbig.o
+	gcc -o printbig printbig.c -DBUILD_TEST -lm
 
 # Building the tarball
 

@@ -215,7 +215,7 @@ double eval_poly(double *poly, float x){
   // evaluate poly at specified value x
   double poly_at_x = 0.0;
   for (int i = 0; i<=poly_order; i++)
-    poly_at_x += poly[i];
+    poly_at_x += poly[i] * pow(x, i);
 
   return poly_at_x;
 }

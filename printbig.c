@@ -242,33 +242,18 @@ bool equal_compare_poly(double *poly1, double *poly2){
 
 }
 
-/*
-//INCOMPLETE
-double* poly_division(double *poly1, double *poly2){
+
+//poly divison by float
+double* poly_division(double *poly1, double denominator){
   int poly1_order = order(poly1);
-  int poly2_order = order(poly2);
 
-  double *poly_quotient = malloc((poly1_order-poly2_order-1) * sizeof (double));
-  int poly_quotient_arr_size = poly1_order-poly2_order-1;
-  double *poly_remainder = malloc((poly_quotient_arr_size-1) * sizeof (double));
+  // poly_divisor will be order 0 and represents the division by the denominator
+  double *poly_divisor = malloc(sizeof (double));
+  poly_divisor[0] = 1.0 / denominator;
   
-  // Initialize the quotient polynomial with 0s as constants
-  for (int i = 0; i<poly1_order+poly2_order-1; i++)
-    poly_quotient[i] = 0;
-
-  // Loop through each term of first polynomial
-  for (int i=0; i<poly1_order; i++)
-  {
-    // Multiply the current term of first polynomial
-    // with every term of second polynomial.
-    for (int j=0; j<poly2_order; j++)
-        poly_quotient[i+j] += poly1[i]*poly2[j];
-  }
-
-  return poly_quotient;
+  return poly_multiplication(poly1, poly_divisor);
 
 }
-*/
 
 
 

@@ -338,8 +338,46 @@ char* poly_to_str(double *poly){
 
 }
 
+char* poly_to_tex(double *poly){
+  int poly_order = order(poly);
+  const int max_digits = 350;
+  
+  //empty poly
+  if(poly_order<0){
+    char *poly_str = malloc( sizeof (char));
+    poly_str[0] = '\0';
+    return poly_str;
+  }
 
+  //this allocates the max amount of space that could possibly be needed (should probably be optimized)
+  char *poly_string = malloc(poly_order* (7+(4*max_digits))* sizeof (char));
+  char *poly_str_ind = poly_string;
 
+  poly_str_ind += sprintf(poly_str_ind, "$$");
+
+  for (int i = poly_order; i>=0; i--){
+    if(poly[i]==0.0)
+      continue;
+
+    //order 0 poly
+    if(i==0){
+      poly_str_ind += sprintf(poly_str_ind, poly[i]>0.0 ? "+%f" : "%f", poly[i]);
+    }
+    //order 1 polynomial
+    else if(i==1){
+      poly_str_ind += sprintf(poly_str_ind, poly[i]>0.0 ? "+%fx" : "%fx", poly[i]);
+    }
+    //higher order polynomials
+    else{
+      poly_str_ind += sprintf(poly_str_ind, i==poly_order ? "%fx^{%i}" : poly[i]>0.0 ? "+%fx^{%i}" : "%fx^{%i}", poly[i], i);
+    }
+  }
+
+  poly_str_ind += sprintf(poly_str_ind, "$$");
+
+  return poly_string;
+
+}
 
 #ifdef BUILD_TEST
 int main()

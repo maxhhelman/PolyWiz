@@ -97,6 +97,15 @@ let check (globals, functions) =
       | Fliteral l -> (Float, SFliteral l)
       | BoolLit l  -> (Bool, SBoolLit l)
       | Sliteral l -> (String, SSliteral l)
+     (* | ArrayLiteral l ->        
+      if List.length l > 0 then 
+          let typ = expr(List.nth l 0) in
+          (string_of_typ typ)
+          "int" -> (Int, SArrayLiteral(l)) 
+          "float" -> (Float, SArrayLiteral(l))
+          "bool" -> (Bool, SArrayLiteral(l)) 
+          "string" -> (String, SArrayLiteral(l)) 
+      else (Void, SArrayLiteral([])) *)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex ->

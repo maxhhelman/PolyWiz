@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not | Abs
 
-type typ = Int | Bool | Float | Void | String
+type typ = Int | Bool | Float | Void | String | Array of typ 
 
 type bind = typ * string
 
@@ -14,6 +14,7 @@ type expr =
   | Fliteral of string
   | Sliteral of string
   | BoolLit of bool
+  | ArrayLit of expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -29,6 +30,9 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
+type var_decl = 
+  Vardecl of typ * expr 
+
 type func_decl = {
     typ : typ;
     fname : string;
@@ -38,6 +42,7 @@ type func_decl = {
   }
 
 type program = bind list * func_decl list
+
 
 (* Pretty-printing functions *)
 
@@ -73,6 +78,7 @@ let rec string_of_expr = function
   | Sliteral(l) -> l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
+  | ArrayLit (e) -> "[" ^ String.concat ", " (List.map string_of_expr e) ^ "]"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -95,12 +101,13 @@ let rec string_of_stmt = function
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
-let string_of_typ = function
+let rec string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Float -> "float"
   | Void -> "void"
   | String -> "string"
+  | Array(t)-> "[" ^ string_of_typ t ^ "]"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

@@ -351,7 +351,7 @@ char* poly_to_tex(double *poly){
 
   //this allocates the max amount of space that could possibly be needed (should probably be optimized)
   char *poly_string = malloc(poly_order* (7+(4*max_digits))* sizeof (char));
-  char *poly_str_ind = poly_string+2;
+  char *poly_str_ind = poly_string;
 
   poly_str_ind += sprintf(poly_str_ind, "$$");
 

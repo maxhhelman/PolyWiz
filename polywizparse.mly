@@ -68,7 +68,7 @@ typ:
   | FLOAT { Float }
   | VOID  { Void  }
   | STRING { String }
-  | LBRACK typ RBRACK { Array($2) }
+  | typ LBRACK RBRACK { Array($1) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -95,6 +95,10 @@ expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }
 
+element:
+  {[]}
+  | elements_list {List.rev $1}
+
 elements_list:
   expr {[$1]}
 | elements_list COMMA expr {$3 :: $1 }
@@ -105,7 +109,7 @@ expr:
   | BLIT             { BoolLit($1)            }
   | SLIT             { Sliteral($1)           }
   | ID               { Id($1)                 }
-  | LBRACK elements_list RBRACK { ArrayLit($2) }
+  | LBRACK element RBRACK { ArrayLit($2) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }

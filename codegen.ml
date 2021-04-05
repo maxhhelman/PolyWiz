@@ -36,6 +36,14 @@ let translate (globals, functions) =
   (* String type *)
   let string_t = L.pointer_type i8_t in
 
+  (* Poly type *)
+  let poly_t = L.pointer_type float_t in  
+
+  (* array types *)
+  let float_arr_t = L.pointer_type float_t in  
+  let int_arr_t = L.pointer_type i32_t in  
+
+
 (* Return the LLVM type for a PolyWiz type *)
   let ltype_of_typ = function
       A.Int   -> i32_t
@@ -43,6 +51,7 @@ let translate (globals, functions) =
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t
+    | A.Poly -> poly_t
   in
 
   (* Create a map of global variables after creating each *)
@@ -216,10 +225,10 @@ let translate (globals, functions) =
     | A.Not                  -> L.build_not e' "tmp" builder
     | A.Abs when t = A.Float ->
       let abs_external_func_floats = L.declare_function "abs_operator_float" (L.function_type float_t [|float_t|]) the_module in
-      L.build_call abs_external_func_floats [| e' |] "abs_operator_llvm" builder
+      L.build_call abs_external_func_floats [| e' |] "abs_operator_float_llvm" builder
     | A.Abs                  ->
       let abs_external_func_ints = L.declare_function "abs_operator_int" (L.function_type i32_t [|i32_t|]) the_module in
-      L.build_call abs_external_func_ints [| e' |] "abs_operator_llvm" builder )
+      L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder )
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	    "printf" builder
@@ -230,6 +239,9 @@ let translate (globals, functions) =
 	    "printf" builder
       | SCall ("printstr", [e]) ->
 	  L.build_call printf_func [| str_format_str ; (expr builder e) |] "printf" builder
+      | SCall ("new_poly", [e1;e2]) ->
+        let new_poly_external_func = L.declare_function "new_poly" (L.function_type poly_t [|float_arr_t; int_arr_t|]) the_module in
+        L.build_call new_poly_external_func [| expr builder e1; expr builder e2 |] "new_poly_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

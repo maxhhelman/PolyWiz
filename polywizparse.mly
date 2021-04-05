@@ -7,7 +7,7 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token LBRACK RBRACK 
-%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF STRING
+%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF STRING POLY
 %token EXP ABS
 %token <int> LITERAL
 %token <bool> BLIT
@@ -68,6 +68,7 @@ typ:
   | FLOAT { Float }
   | VOID  { Void  }
   | STRING { String }
+  | POLY { Poly }
   | typ LBRACK RBRACK { Array($1) }
 
 vdecl_list:

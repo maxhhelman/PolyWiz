@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not | Abs
 
-type typ = Int | Bool | Float | Void | String | Array of typ 
+type typ = Int | Bool | Float | Void | String | Array of typ | Poly
 
 type bind = typ * string
 
@@ -107,6 +107,7 @@ let rec string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "string"
+  | Poly -> "poly"
   | Array(t)-> "[" ^ string_of_typ t ^ "]"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"

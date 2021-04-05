@@ -41,6 +41,7 @@ rule token = parse
 | "bool"   { BOOL }
 | "float"  { FLOAT }
 | "string" { STRING }
+| "poly" { POLY }
 | "void"   { VOID }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }

@@ -36,16 +36,22 @@ let translate (globals, functions) =
   (* String type *)
   let string_t = L.pointer_type i8_t in
 
-  let array_t = L.pointer_type i8_t in
+  let array_t = function 
+        A.Int    -> L.pointer_type i32_t 
+      | A.Bool  -> L.pointer_type i1_t
+      | A.Float -> L.pointer_type float_t
+      | A.String -> L.pointer_type string_t
+      | _ -> L.pointer_type i32_t 
+  in
 
 (* Return the LLVM type for a PolyWiz type *)
-  let rec ltype_of_typ = function
+  let ltype_of_typ = function
       A.Int   -> i32_t
     | A.Bool  -> i1_t
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t
-    | A.Array(t) -> array_t
+    | A.Array(t) -> array_t t
   in
 
   (* Create a map of global variables after creating each *)

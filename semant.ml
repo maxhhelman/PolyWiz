@@ -103,10 +103,10 @@ let check (globals, functions) =
           let new_typ = typ in 
           let l' = List.map expr l in
           match new_typ with
-           Literal _ -> (Int, SArrayLit l') 
-          |Fliteral  _ -> (Float, SArrayLit l')
-          |BoolLit  _ -> (Bool, SArrayLit  l') 
-          |Sliteral _ -> (String, SArrayLit l') 
+           Literal _ -> (Array(Int), SArrayLit l') 
+          |Fliteral  _ -> (Array(Float), SArrayLit l')
+          |BoolLit  _ -> (Array(Bool), SArrayLit  l') 
+          |Sliteral _ -> (Array(String), SArrayLit l') 
           | _ ->  raise (Failure ("not a valid array type"))
       else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)

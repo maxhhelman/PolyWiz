@@ -63,12 +63,12 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    INT   { Int   }
+   typ LBRACK RBRACK { Array($1) }
+  |  INT   { Int   }
   | BOOL  { Bool  }
   | FLOAT { Float }
   | VOID  { Void  }
   | STRING { String }
-  | typ LBRACK RBRACK { Array($1) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -104,12 +104,12 @@ elements_list:
 | elements_list COMMA expr {$3 :: $1 }
 
 expr:
-    LITERAL          { Literal($1)            }
+   LBRACK element RBRACK { ArrayLit($2) }
+  |  LITERAL          { Literal($1)            }
   | FLIT	     { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
   | SLIT             { Sliteral($1)           }
   | ID               { Id($1)                 }
-  | LBRACK element RBRACK { ArrayLit($2) }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }

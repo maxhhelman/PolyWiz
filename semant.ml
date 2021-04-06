@@ -97,15 +97,18 @@ let check (globals, functions) =
       | Fliteral l -> (Float, SFliteral l)
       | BoolLit l  -> (Bool, SBoolLit l)
       | Sliteral l -> (String, SSliteral l)
-     (* | ArrayLiteral l ->        
+      | ArrayLit l ->        
       if List.length l > 0 then 
-          let typ = expr(List.nth l 0) in
-          (string_of_typ typ)
-          "int" -> (Int, SArrayLiteral(l)) 
-          "float" -> (Float, SArrayLiteral(l))
-          "bool" -> (Bool, SArrayLiteral(l)) 
-          "string" -> (String, SArrayLiteral(l)) 
-      else (Void, SArrayLiteral([])) *)
+          let typ = (List.nth l 0) in
+          let new_typ = typ in 
+          let l' = List.map expr l in
+          match new_typ with
+           Literal _ -> (Array(Int), SArrayLit l') 
+          |Fliteral  _ -> (Array(Float), SArrayLit l')
+          |BoolLit  _ -> (Array(Bool), SArrayLit  l') 
+          |Sliteral _ -> (Array(String), SArrayLit l') 
+          | _ ->  raise (Failure ("not a valid array type"))
+      else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex ->

@@ -107,7 +107,7 @@ let rec string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "string"
-  | Array(t)-> "[" ^ string_of_typ t ^ "]"
+  | Array(t) -> string_of_typ t ^ "[]"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

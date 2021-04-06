@@ -1,7 +1,7 @@
 def int main()
 {
-  int[] new_arr;
-  new_arr = [1,2,3];
+  float[] new_arr;
+  new_arr = [1.0,2.3,3.1];
   print(1);
 
   return 0;

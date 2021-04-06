@@ -36,23 +36,53 @@ let translate (globals, functions) =
   (* String type *)
   let string_t = L.pointer_type i8_t in
 
-  let array_t = function 
-        A.Int    -> L.pointer_type i32_t 
-      | A.Bool  -> L.pointer_type i1_t
-      | A.Float -> L.pointer_type float_t
-      | A.String -> L.pointer_type string_t
-      | _ -> L.pointer_type i32_t 
-  in
-
 (* Return the LLVM type for a PolyWiz type *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int   -> i32_t
     | A.Bool  -> i1_t
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t
-    | A.Array(t) -> array_t t
+    | A.Array(t) -> L.pointer_type (ltype_of_typ t)
   in
+
+
+  (* Array creation, initialization, access *)
+  let create_array t len builder =
+    let ltype = ltype_of_typ t in
+    let size_t = L.build_intcast (L.size_of ltype) i32_t "tmp" builder in
+    let total_size = L.build_mul size_t len "tmp" builder in
+    let total_size = L.build_add total_size (L.const_int i32_t 1) "tmp" builder in
+    let arr_malloc = L.build_array_malloc ltype total_size "tmp" builder in
+    let arr = L.build_pointercast arr_malloc (L.pointer_type ltype) "tmp" builder in
+    arr
+  in
+
+  let initialize_array t el builder =
+    let len = L.const_int i32_t (List.length el) in
+    let arr = create_array t len builder in
+    let _ =
+      let assign_value i =
+        let index = L.const_int i32_t i in
+        let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
+        let _val = L.build_gep arr [| index |] "tmp" builder in
+        L.build_store (List.nth el i) _val builder
+      in
+      for i = 0 to (List.length el)-1 do
+        ignore (assign_value i)
+      done
+    in
+    arr
+  in
+
+  let access_array arr index assign builder =
+    let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
+    let arr = L.build_load arr "tmp" builder in
+    let _val = L.build_gep arr [| index |] "tmp" builder in
+    if assign then _val else L.build_load _val "tmp" builder
+  in
+
+
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -132,6 +162,16 @@ let translate (globals, functions) =
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SSliteral l -> L.build_global_stringptr ( String.sub l 1 ((String.length l) - 2)) "str" builder
       | SFliteral l -> L.const_float_of_string float_t l
+      | SArrayLit l -> 
+        let e = (List.nth l 0) in
+        let arr_element_type = function
+            (A.Int, SLiteral _)  -> A.Int
+          | (A.Float, SFliteral _) -> A.Float 
+          | (A.Bool, SBoolLit _) -> A.Bool
+          | (A.String, SSliteral _) -> A.String 
+          | _ -> raise (Failure ("Invalid array type")) in
+        let array_type = arr_element_type e in
+        initialize_array array_type (List.map (expr builder) l) builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
@@ -247,11 +287,6 @@ let translate (globals, functions) =
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder
     in
-
-    (* LLVM insists each basic block end with exactly one "terminator"
-       instruction that transfers control.  This function runs "instr builder"
-       if the current block does not already have a terminator.  Used,
-       e.g., to handle the "fall off the end of the function" case. *)
     let add_terminal builder instr =
       match L.block_terminator (L.insertion_block builder) with
 	Some _ -> ()

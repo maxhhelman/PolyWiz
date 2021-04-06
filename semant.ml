@@ -34,9 +34,12 @@ let check (globals, functions) =
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls =
     let add_bind map (name, ty) = StringMap.add name {
-      typ = if name=="new_poly" then Poly else Void;
+      typ = if name="new_poly" then Poly
+            else if name="el_at_ind" then Float
+            else Void;
       fname = name;      
-      formals = if name=="new_poly" then [(Array(Float), "x");(Array(Int), "x")] 
+      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
+                else if name="el_at_ind" then [(Poly, "x");(Int, "y")] 
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -44,7 +47,8 @@ let check (globals, functions) =
 			                         ("printf", Float);
 			                         ("printbig", Int);
 						 ("printstr", String);
-             ("new_poly", Bool) ] 
+             ("new_poly", Bool); 
+             ("el_at_ind", Bool) ] 
   in
 
   (* Add function name to symbol table *)
@@ -99,15 +103,18 @@ let check (globals, functions) =
       | Fliteral l -> (Float, SFliteral l)
       | BoolLit l  -> (Bool, SBoolLit l)
       | Sliteral l -> (String, SSliteral l)
-     (* | ArrayLiteral l ->        
+      | ArrayLit l ->        
       if List.length l > 0 then 
-          let typ = expr(List.nth l 0) in
-          (string_of_typ typ)
-          "int" -> (Int, SArrayLiteral(l)) 
-          "float" -> (Float, SArrayLiteral(l))
-          "bool" -> (Bool, SArrayLiteral(l)) 
-          "string" -> (String, SArrayLiteral(l)) 
-      else (Void, SArrayLiteral([])) *)
+          let typ = (List.nth l 0) in
+          let new_typ = typ in 
+          let l' = List.map expr l in
+          match new_typ with
+           Literal _ -> (Array(Int), SArrayLit l') 
+          |Fliteral  _ -> (Array(Float), SArrayLit l')
+          |BoolLit  _ -> (Array(Bool), SArrayLit  l') 
+          |Sliteral _ -> (Array(String), SArrayLit l') 
+          | _ ->  raise (Failure ("not a valid array type"))
+      else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex ->

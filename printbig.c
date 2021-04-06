@@ -7,6 +7,7 @@
 #include <math.h>
 #include <errno.h>
 #include <string.h>
+#include <float.h>
 #include <stdbool.h>
 
 /*
@@ -94,38 +95,45 @@ int abs_operator_int(int a){
 }
 
 int order(double *poly){
-  int poly_size = (int) (sizeof poly / sizeof *poly);
   int poly_order = -1;
-  for(int i=0; i<poly_size; i++){
+  int i=0;
+  //while poly[i] is not the poly sentinal value, DBL_MIN
+  while(poly[i] != DBL_MIN){
+    //set order to largest exponent where its constant != 0
     if(poly[i]!=0.0){
       poly_order = i;
     }
+    i++;
   }
   return poly_order;
 }
 
-double* new_poly(double *consts, int *exponents){
+double* new_poly(double *consts, int consts_length, int *exponents, int exponents_length){
+
   //if unequal size of consts and exponents arrays
-  int consts_arr_size = (int) (sizeof consts / sizeof *consts);
-  int exponents_arr_size = (int) (sizeof exponents / sizeof *exponents);
-  if ( consts_arr_size != exponents_arr_size ) 
+  if ( consts_length != exponents_length ) 
     return NULL;
   
   //find the order of the polynomial
   int order = -1;
-  for(int i=0; i < exponents_arr_size; i++){
+  for(int i=0; i < exponents_length; i++){
     order = exponents[i]>order ? exponents[i]: order;
   }
   if(order<0) return NULL;
 
   //initialize the poly array with zeros
-  double *poly_arr = malloc( (order+1) * sizeof (double));
-  for(int i=0; i <= order; i++){
-    poly_arr[i] = 0.0;
+  double *poly_arr = malloc( (order+2) * sizeof (double));
+  for(int i=0; i <= order+1; i++){
+    if(i<=order)
+      poly_arr[i] = 0.0;
+
+    //terminate the poly arr with DBL_MIN
+    else
+      poly_arr[i] = DBL_MIN;
   }
 
   //fill poly array with inputted constants and exponents
-  for(int i=0; i < exponents_arr_size; i++){
+  for(int i=0; i < exponents_length; i++){
     int exponent = exponents[i];
     double constant = consts[i];
     poly_arr[exponent] = constant;
@@ -140,14 +148,15 @@ double* poly_addition(double *poly1, double *poly2){
   int poly2_order = order(poly2);
 
   // poly_sum array will be the size of the largest input array
-  int poly_sum_size = poly1_order>poly2_order ? poly1_order : poly2_order;
-  double *poly_sum = malloc( poly_sum_size * sizeof (double));
+  int poly_sum_order = poly1_order>poly2_order ? poly1_order : poly2_order;
+  double *poly_sum = malloc( (poly_sum_order+2) * sizeof (double));
 
-  for(int i=0; i<=poly_sum_size; i++){
+  for(int i=0; i<=poly_sum_order; i++){
     double poly1_const = i<=poly1_order ? poly1[i]: 0.0;
     double poly2_const = i<=poly2_order ? poly2[i]: 0.0;
     poly_sum[i] = poly1_const + poly2_const;
   }
+  poly_sum[poly_sum_order+1] = DBL_MIN;
 
   return poly_sum;
 
@@ -158,14 +167,15 @@ double* poly_subtraction(double *poly1, double *poly2){
   int poly2_order = order(poly2);
 
   // poly_diff array will be the size of the largest input array
-  int poly_diff_size = poly1_order>poly2_order ? poly1_order : poly2_order;
-  double *poly_diff = malloc( poly_diff_size * sizeof (double));
+  int poly_diff_order = poly1_order>poly2_order ? poly1_order : poly2_order;
+  double *poly_diff = malloc( (poly_diff_order+2) * sizeof (double));
 
-  for(int i=0; i<=poly_diff_size; i++){
+  for(int i=0; i<=poly_diff_order; i++){
     double poly1_const = i<=poly1_order ? poly1[i]: 0.0;
     double poly2_const = i<=poly2_order ? poly2[i]: 0.0;
     poly_diff[i] = poly1_const - poly2_const;
   }
+  poly_diff[poly_diff_order+1] = DBL_MIN;
 
   return poly_diff;
 
@@ -178,11 +188,13 @@ double* poly_multiplication(double *poly1, double *poly2){
 
   // below code is adapted from https://www.geeksforgeeks.org/multiply-two-polynomials-2/
   // poly_product array will be the size of the sum of the largest exponent on poly1 and poly2
-  double *poly_product = malloc((poly1_order+poly2_order-1) * sizeof (double));
+  int poly_product_order = poly1_order+poly2_order;
+  double *poly_product = malloc((poly_product_order +2) * (sizeof (double)));
   
   // Initialize the product polynomial with 0s as constants
-  for (int i = 0; i<poly1_order+poly2_order-1; i++)
+  for (int i = 0; i<=poly_product_order; i++)
     poly_product[i] = 0;
+  poly_product[poly_product_order+1] = DBL_MIN;
 
   // Loop through each term of first polynomial
   for (int i=0; i<=poly1_order; i++)
@@ -199,17 +211,18 @@ double* poly_multiplication(double *poly1, double *poly2){
 
 double* constants_retriever(double *poly){
   int poly_order = order(poly);
-  double *poly_consts = malloc((poly_order) * sizeof (double));
+  double *poly_consts = malloc((poly_order+2) * sizeof (double));
   
   // full in the poly consts array
   for (int i = 0; i<=poly_order; i++)
     poly_consts[i] = poly[i];
+  poly_consts[poly_order+1] = DBL_MIN;
 
   return poly_consts;
 
 }
 
-double eval_poly(double *poly, float x){
+double eval_poly(double *poly, double x){
   int poly_order = order(poly);
   
   // evaluate poly at specified value x
@@ -245,11 +258,11 @@ bool equal_compare_poly(double *poly1, double *poly2){
 
 //poly divison by float
 double* poly_division(double *poly1, double denominator){
-  int poly1_order = order(poly1);
 
   // poly_divisor will be order 0 and represents the division by the denominator
-  double *poly_divisor = malloc(sizeof (double));
+  double *poly_divisor = malloc((2) * sizeof (double));
   poly_divisor[0] = 1.0 / denominator;
+  poly_divisor[1] = DBL_MIN;
   
   return poly_multiplication(poly1, poly_divisor);
 
@@ -261,19 +274,26 @@ double* poly_composition(double *poly1, double *poly2){
   int poly1_order = order(poly1);
   int poly2_order = order(poly2);
 
-  double *composed_poly = malloc((poly1_order*poly2_order) * sizeof (double));
+  int composed_poly_order = poly1_order*poly2_order;
+  double *composed_poly = malloc((composed_poly_order+2) * sizeof (double));
   // Initialize the composed polynomial with 0s as constants
-  for (int i = 0; i<=poly1_order*poly2_order; i++)
+  for (int i = 0; i<=composed_poly_order; i++)
     composed_poly[i] = 0;
+  composed_poly[composed_poly_order+1] = DBL_MIN;
   
   // Loop through each term of first polynomial
   for (int i=0; i<=poly1_order; i++)
   {
     //compose this term
-    double *current_term = malloc((i*poly2_order) * sizeof (double));
+    int current_term_order = i*poly2_order;
+    double *current_term = malloc((current_term_order+2) * sizeof (double));
+
     // Initialize the current poly with poly2
-    for (int i = 0; i<=poly2_order; i++)
-      current_term[i] = poly2[i];
+    for (int i = 0; i<=current_term_order; i++){
+      current_term[i] = i<=poly2_order ? poly2[i]: 0.0;
+    }
+    current_term[current_term_order+1] = DBL_MIN;
+
     //foil this term
     for(int j=i; j>0; j--){
       current_term = poly_multiplication(current_term, poly2);
@@ -363,6 +383,17 @@ char* poly_to_tex(double *poly){
   return poly_string;
 
 }
+
+//get poly const at ind
+double el_at_ind(double *poly, int ind){
+  int poly_order = order(poly);
+
+  if(ind>poly_order)
+    return 0.0;
+
+  return poly[ind];
+}
+
 
 #ifdef BUILD_TEST
 int main()

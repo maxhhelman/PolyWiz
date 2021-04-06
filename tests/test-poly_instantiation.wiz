@@ -1,0 +1,7 @@
+def int main()
+{
+  poly poly1;
+  print(1);
+
+  return 0;
+}

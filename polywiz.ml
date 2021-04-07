@@ -1,4 +1,4 @@
-(* Top-level of the MicroC compiler: scan & parse the input,
+(* Top-level of the PolyWiz compiler: scan & parse the input,
    check the resulting AST and generate an SAST from it, generate LLVM IR,
    and dump the module *)
 
@@ -13,13 +13,13 @@ let () =
     ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     ("-c", Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
-  ] in  
-  let usage_msg = "usage: ./microc.native [-a|-s|-l|-c] [file.mc]" in
+  ] in
+  let usage_msg = "usage: ./polywiz.native [-a|-s|-l|-c] [file.mc]" in
   let channel = ref stdin in
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
-  
+
   let lexbuf = Lexing.from_channel !channel in
-  let ast = Microcparse.program Scanner.token lexbuf in  
+  let ast = Polywizparse.program Scanner.token lexbuf in
   match !action with
     Ast -> print_string (Ast.string_of_program ast)
   | _ -> let sast = Semant.check ast in

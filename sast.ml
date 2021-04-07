@@ -7,6 +7,8 @@ and sx =
     SLiteral of int
   | SFliteral of string
   | SBoolLit of bool
+  | SSliteral of string
+  | SArrayLit of sexpr list 
   | SId of string
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
@@ -40,6 +42,8 @@ let rec string_of_sexpr (t, e) =
   | SBoolLit(true) -> "true"
   | SBoolLit(false) -> "false"
   | SFliteral(l) -> l
+  | SSliteral(l) -> l
+  | SArrayLit (l) -> "[" ^ String.concat ", " (List.map string_of_sexpr l) ^ "]"
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
@@ -48,7 +52,7 @@ let rec string_of_sexpr (t, e) =
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
-				  ) ^ ")"				     
+				  ) ^ ")"
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->
@@ -65,7 +69,7 @@ let rec string_of_sstmt = function
   | SWhile(e, s) -> "while (" ^ string_of_sexpr e ^ ") " ^ string_of_sstmt s
 
 let string_of_sfdecl fdecl =
-  string_of_typ fdecl.styp ^ " " ^
+  "def " ^ string_of_typ fdecl.styp ^ " " ^
   fdecl.sfname ^ "(" ^ String.concat ", " (List.map snd fdecl.sformals) ^
   ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.slocals) ^

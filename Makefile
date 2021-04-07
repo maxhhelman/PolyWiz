@@ -8,29 +8,29 @@ test : all testall.sh
 # to test linking external code
 
 .PHONY : all
-all : microc.native printbig.o
+all : polywiz.native printbig
 
-# "make microc.native" compiles the compiler
+# "make polywiz.native" compiles the compiler
 #
 # The _tags file controls the operation of ocamlbuild, e.g., by including
 # packages, enabling warnings
 #
 # See https://github.com/ocaml/ocamlbuild/blob/master/manual/manual.adoc
 
-microc.native :
+polywiz.native :
 	opam config exec -- \
-	ocamlbuild -use-ocamlfind microc.native
+	ocamlbuild -use-ocamlfind polywiz.native
 
 # "make clean" removes all generated files
 
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.o
+	rm -rf testall.log printbig ocamlllvm *.diff *.o
 
 # Testing the "printbig" example
-printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
+printbig : printbig.o
+	gcc -o printbig printbig.c -DBUILD_TEST -lm
 
 # Building the tarball
 
@@ -46,15 +46,15 @@ FAILS = \
   func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
   return1 return2 while1 while2
 
-TESTFILES = $(TESTS:%=test-%.mc) $(TESTS:%=test-%.out) \
-	    $(FAILS:%=fail-%.mc) $(FAILS:%=fail-%.err)
+TESTFILES = $(TESTS:%=test-%.pwiz) $(TESTS:%=test-%.out) \
+	    $(FAILS:%=fail-%.pwiz) $(FAILS:%=fail-%.err)
 
-TARFILES = ast.ml sast.ml codegen.ml Makefile _tags microc.ml microcparse.mly \
+TARFILES = ast.ml sast.ml codegen.ml Makefile _tags polywiz.ml polywizparse.mly \
 	README scanner.mll semant.ml testall.sh \
 	printbig.c arcade-font.pbm font2c \
 	Dockerfile \
-	$(TESTFILES:%=tests/%) 
+	$(TESTFILES:%=tests/%)
 
-microc.tar.gz : $(TARFILES)
-	cd .. && tar czf microc/microc.tar.gz \
-		$(TARFILES:%=microc/%)
+polywiz.tar.gz : $(TARFILES)
+	cd .. && tar czf polywiz/polywiz.tar.gz \
+		$(TARFILES:%=polywiz/%)

@@ -1,6 +1,6 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for PolyWiz *)
 
-{ open Microcparse }
+{ open Polywizparse }
 
 let digit = ['0' - '9']
 let digits = digit+
@@ -10,6 +10,8 @@ rule token = parse
 | "/*"     { comment lexbuf }           (* Comments *)
 | '('      { LPAREN }
 | ')'      { RPAREN }
+| '['      { LBRACK }
+| ']'      { RBRACK }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
 | ';'      { SEMI }
@@ -38,13 +40,15 @@ rule token = parse
 | "int"    { INT }
 | "bool"   { BOOL }
 | "float"  { FLOAT }
+| "string" { STRING }
 | "void"   { VOID }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "def"    { DEF }
 | digits as lxm { LITERAL(int_of_string lxm) }
-| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
-| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
+| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )?  as lxm { FLIT(lxm) }
+| ('"'[^'"''\\']*('\\'_[^'"''\\']*)*'"') as lxm { SLIT(lxm) }
+| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*      as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 

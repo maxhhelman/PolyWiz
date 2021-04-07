@@ -1,4 +1,4 @@
-/* Ocamlyacc parser for MicroC */
+/* Ocamlyacc parser for PolyWiz */
 
 %{
 open Ast
@@ -6,11 +6,12 @@ open Ast
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF
+%token LBRACK RBRACK 
+%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF STRING
 %token EXP ABS
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> ID FLIT
+%token <string> ID FLIT SLIT
 %token EOF
 
 %start program
@@ -28,6 +29,12 @@ open Ast
 %left TIMES DIVIDE
 %left EXP
 %right NOT
+%nonassoc LBRACK 
+%nonassoc RBRACK 
+%nonassoc LBRACE 
+%nonassoc RBRACE
+%nonassoc LPAREN 
+%nonassoc RPAREN  
 
 %%
 
@@ -44,7 +51,7 @@ fdecl:
      { { typ = $2;
 	 fname = $3;
 	 formals = List.rev $5;
-	 locals = List.rev $8;
+   locals = List.rev $8;
 	 body = List.rev $9 } }
 
 formals_opt:
@@ -56,10 +63,12 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    INT   { Int   }
+   typ LBRACK RBRACK { Array($1) }
+  |  INT   { Int   }
   | BOOL  { Bool  }
   | FLOAT { Float }
   | VOID  { Void  }
+  | STRING { String }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -86,10 +95,20 @@ expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }
 
+element:
+  {[]}
+  | elements_list {List.rev $1}
+
+elements_list:
+  expr {[$1]}
+| elements_list COMMA expr {$3 :: $1 }
+
 expr:
-    LITERAL          { Literal($1)            }
+   LBRACK element RBRACK { ArrayLit($2) }
+  |  LITERAL          { Literal($1)            }
   | FLIT	     { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
+  | SLIT             { Sliteral($1)           }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }

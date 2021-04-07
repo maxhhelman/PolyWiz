@@ -78,7 +78,7 @@ let translate (globals, functions) =
     let _ =
       let assign_value i =
         let ind = L.build_add (ci i)
-         (ci 1) "tmp" builder
+         (ci 0) "tmp" builder
          in
         L.build_store (List.nth elems i)
          (L.build_gep arr [| ind |] "tmp" builder) builder
@@ -222,7 +222,8 @@ let translate (globals, functions) =
                     L.build_call poly_addition_external_func [| e1'; e2' |] "poly_addition_llvm" builder
 	  | A.Sub     -> let poly_subtraction_external_func = L.declare_function "poly_subtraction" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
                     L.build_call poly_subtraction_external_func [| e1'; e2' |] "poly_subtraction_llvm" builder
-	  | A.Mult    -> raise (Failure "need to implement")
+	  | A.Mult    -> let poly_multiplication_external_func = L.declare_function "poly_multiplication" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
+                    L.build_call poly_multiplication_external_func [| e1'; e2' |] "poly_multiplication_llvm" builder
 	  | A.Div     -> raise (Failure "need to implement")
     | A.Exp     -> raise (Failure "internal error: semant should have rejected ^ on poly")
 	  | A.Equal   -> raise (Failure "need to implement")

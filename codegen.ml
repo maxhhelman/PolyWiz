@@ -47,42 +47,6 @@ let translate (globals, functions) =
   in
 
 
-  (* Array creation, initialization, access *)
-  let create_array t len builder =
-    let ltype = ltype_of_typ t in
-    let size_t = L.build_intcast (L.size_of ltype) i32_t "tmp" builder in
-    let total_size = L.build_mul size_t len "tmp" builder in
-    let total_size = L.build_add total_size (L.const_int i32_t 1) "tmp" builder in
-    let arr_malloc = L.build_array_malloc ltype total_size "tmp" builder in
-    let arr = L.build_pointercast arr_malloc (L.pointer_type ltype) "tmp" builder in
-    arr
-  in
-
-  let initialize_array t el builder =
-    let len = L.const_int i32_t (List.length el) in
-    let arr = create_array t len builder in
-    let _ =
-      let assign_value i =
-        let index = L.const_int i32_t i in
-        let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
-        let _val = L.build_gep arr [| index |] "tmp" builder in
-        L.build_store (List.nth el i) _val builder
-      in
-      for i = 0 to (List.length el)-1 do
-        ignore (assign_value i)
-      done
-    in
-    arr
-  in
-
-  let access_array arr index assign builder =
-    let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
-    let arr = L.build_load arr "tmp" builder in
-    let _val = L.build_gep arr [| index |] "tmp" builder in
-    if assign then _val else L.build_load _val "tmp" builder
-  in
-
-
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =

@@ -233,18 +233,15 @@ bool equal_compare_poly(double *poly1, double *poly2){
   int poly1_order = order(poly1);
   int poly2_order = order(poly2);
   
+  //if not the same order, not equal
+  if(poly1_order != poly2_order)
+    return false;
+
   // check if all poly constants are equal
   bool equal = true;
-  for (int i = 0; i<= (poly2_order>poly1_order ? poly2_order : poly1_order); i++){
-    if(poly1_order<=i && poly2[i]!=0.0){
-      equal=false;
-    }
-    else if(poly2_order<=i && poly1[i]!=0.0){
-      equal=false;
-    }
-    else if(poly1[i]!=poly2[i]){
+  for (int i = 0; i<= poly1_order; i++){
+    if(poly1[i]!=poly2[i])
       equal = false;
-    }
   }
 
   return equal;
@@ -255,18 +252,15 @@ bool nequal_compare_poly(double *poly1, double *poly2){
   int poly1_order = order(poly1);
   int poly2_order = order(poly2);
   
+  //if not the same order, not equal
+  if(poly1_order != poly2_order)
+    return false;
+
   // check if all poly constants are equal
   bool equal = true;
-  for (int i = 0; i<= (poly2_order>poly1_order ? poly2_order : poly1_order); i++){
-    if(poly1_order<=i && poly2[i]!=0.0){
-      equal=false;
-    }
-    else if(poly2_order<=i && poly1[i]!=0.0){
-      equal=false;
-    }
-    else if(poly1[i]!=poly2[i]){
+  for (int i = 0; i<= poly1_order; i++){
+    if(poly1[i]!=poly2[i])
       equal = false;
-    }
   }
 
   return !equal;

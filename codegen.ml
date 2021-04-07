@@ -213,6 +213,14 @@ let translate (globals, functions) =
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+          A.Div -> let poly_division_external_func = L.declare_function "poly_division" (L.function_type poly_t [|poly_t; float_t|]) the_module in
+                    L.build_call poly_division_external_func [| e1'; e2' |] "poly_division_llvm" builder
+          | _ -> raise (Failure "This operation is invalid for a poly and float operand.")
+        )
 
       | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
 	  let e1' = expr builder e1
@@ -224,7 +232,6 @@ let translate (globals, functions) =
                     L.build_call poly_subtraction_external_func [| e1'; e2' |] "poly_subtraction_llvm" builder
 	  | A.Mult    -> let poly_multiplication_external_func = L.declare_function "poly_multiplication" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
                     L.build_call poly_multiplication_external_func [| e1'; e2' |] "poly_multiplication_llvm" builder
-	  | A.Div     -> raise (Failure "need to implement")
     | A.Exp     -> raise (Failure "internal error: semant should have rejected ^ on poly")
 	  | A.Equal   -> raise (Failure "need to implement")
 	  | A.Neq     -> raise (Failure "need to implement")
@@ -232,8 +239,8 @@ let translate (globals, functions) =
 	  | A.Leq     -> raise (Failure "internal error: semant should have rejected <= on poly")
 	  | A.Greater -> raise (Failure "internal error: semant should have rejected > on poly")
 	  | A.Geq     -> raise (Failure "internal error: semant should have rejected >= on poly")
-	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on poly"))
+	  | A.And | A.Or -> raise (Failure "internal error: semant should have rejected and/or on poly")
+    | _ -> raise (Failure "This operation is invalid for two poly operands."))
 
       | SBinop (((A.Float,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
 	  let e1' = expr builder e1
@@ -252,8 +259,7 @@ let translate (globals, functions) =
 	  | A.Leq     -> L.build_fcmp L.Fcmp.Ole e1' e2' "tmp" builder
 	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt e1' e2' "tmp" builder
 	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge e1' e2' "tmp" builder
-	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on float"))
+	  | A.And | A.Or -> raise (Failure "internal error: semant should have rejected and/or on float"))
 
         | SBinop (((A.Float,_ ) as e1), op, ((A.Int,_ ) as e2)) -> (* Binary op where e1 (float), e2 (int) *)
 	  let e1' = expr builder e1

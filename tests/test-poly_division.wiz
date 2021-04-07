@@ -1,0 +1,14 @@
+def int main()
+{
+  poly poly1;
+  float denominator;
+  poly poly_quotient;
+
+  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0]);
+  denominator = 2.0;
+  poly_quotient = poly1 / denominator;
+
+  printf(el_at_ind(poly_quotient, 2));
+
+  return 0;
+}

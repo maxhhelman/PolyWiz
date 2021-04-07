@@ -143,6 +143,7 @@ let check (globals, functions) =
             Add | Sub | Mult | Div | Exp when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div | Exp when same && t1 = Float -> Float
           | Add | Sub | Mult when same && t1 = Poly -> Poly
+          | Div when t1=Poly && t2=Float -> Poly
           | Exp when false==same-> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq

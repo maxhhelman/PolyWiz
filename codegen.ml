@@ -46,43 +46,52 @@ let translate (globals, functions) =
     | A.Array(t) -> L.pointer_type (ltype_of_typ t)
   in
 
-
-  (* Array creation, initialization, access *)
-  let create_array t len builder =
-    let ltype = ltype_of_typ t in
-    let size_t = L.build_intcast (L.size_of ltype) i32_t "tmp" builder in
-    let total_size = L.build_mul size_t len "tmp" builder in
-    let total_size = L.build_add total_size (L.const_int i32_t 1) "tmp" builder in
-    let arr_malloc = L.build_array_malloc ltype total_size "tmp" builder in
-    let arr = L.build_pointercast arr_malloc (L.pointer_type ltype) "tmp" builder in
+  (* Array creation, initialization, indexing
+     Note: Beets (2017) was very helpful here since their arrays are similar to ours
+     So we'd like to cite their code for this part*)
+  let ci = L.const_int i32_t
+    in
+  let new_arr t len builder =
+    let s_tot = L.build_add (L.build_mul (L.build_intcast 
+     (L.size_of (ltype_of_typ t)) i32_t "tmp" builder)
+     len "tmp" builder) (ci 1) "tmp" builder
+     in
+    let arr = L.build_pointercast (L.build_array_malloc (ltype_of_typ t) s_tot "tmp" builder)
+     (L.pointer_type (ltype_of_typ t)) "tmp" builder
+     in
     arr
   in
 
-  let initialize_array t el builder =
-    let len = L.const_int i32_t (List.length el) in
-    let arr = create_array t len builder in
+  let instantiate_arr t elems builder =
+    let arr = new_arr t
+     (ci (List.length elems)) builder
+      in
     let _ =
       let assign_value i =
-        let index = L.const_int i32_t i in
-        let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
-        let _val = L.build_gep arr [| index |] "tmp" builder in
-        L.build_store (List.nth el i) _val builder
+        let ind = L.build_add (ci i)
+         (ci 1) "tmp" builder
+         in
+        L.build_store (List.nth elems i)
+         (L.build_gep arr [| ind |] "tmp" builder) builder
       in
-      for i = 0 to (List.length el)-1 do
-        ignore (assign_value i)
-      done
+      let n = ((List.length elems)-1)
+      in
+        let rec rec_count cnt =
+          (* I know if else is terrible style. It was being hissy on pattern matching *)
+          if cnt = n then ignore (assign_value cnt)
+          else (ignore (assign_value cnt); rec_count (cnt+1))
+        in
+        rec_count 0
     in
     arr
   in
 
-  let access_array arr index assign builder =
-    let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
+(*  let index_array arr ind assign builder =
     let arr = L.build_load arr "tmp" builder in
-    let _val = L.build_gep arr [| index |] "tmp" builder in
+    let _val = L.build_gep arr [| (L.build_add ind (ci 1) "tmp" builder) |]
+     "tmp" builder in
     if assign then _val else L.build_load _val "tmp" builder
-  in
-
-
+  in *)
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -171,7 +180,7 @@ let translate (globals, functions) =
           | (A.String, SSliteral _) -> A.String 
           | _ -> raise (Failure ("Invalid array type")) in
         let array_type = arr_element_type e in
-        initialize_array array_type (List.map (expr builder) l) builder
+        instantiate_arr array_type (List.map (expr builder) l) builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
@@ -353,3 +362,4 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
+

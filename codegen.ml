@@ -220,7 +220,8 @@ let translate (globals, functions) =
 	  (match op with
 	    A.Add     -> let poly_addition_external_func = L.declare_function "poly_addition" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
                     L.build_call poly_addition_external_func [| e1'; e2' |] "poly_addition_llvm" builder
-	  | A.Sub     -> raise (Failure "need to implement")
+	  | A.Sub     -> let poly_subtraction_external_func = L.declare_function "poly_subtraction" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
+                    L.build_call poly_subtraction_external_func [| e1'; e2' |] "poly_subtraction_llvm" builder
 	  | A.Mult    -> raise (Failure "need to implement")
 	  | A.Div     -> raise (Failure "need to implement")
     | A.Exp     -> raise (Failure "internal error: semant should have rejected ^ on poly")

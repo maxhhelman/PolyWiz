@@ -360,6 +360,9 @@ let translate (globals, functions) =
       | SCall ("el_at_ind", [e1;e2]) ->
         let el_at_ind_external_func = L.declare_function "el_at_ind" (L.function_type float_t [|poly_t; i32_t|]) the_module in
         L.build_call el_at_ind_external_func [| expr builder e1; expr builder e2 |] "el_at_ind_llvm" builder
+      | SCall ("order", [e]) ->
+        let order_external_func = L.declare_function "order" (L.function_type i32_t [|poly_t|]) the_module in
+        L.build_call order_external_func [| expr builder e |] "order_llvm" builder
       | SCall ("to_str", [e]) ->
         let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder

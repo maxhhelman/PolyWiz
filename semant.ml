@@ -34,15 +34,21 @@ let check (globals, functions) =
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls =
     let add_bind map (name, ty) = StringMap.add name {
-      typ = Void;
-      fname = name;
-      formals = [(ty, "x")];
+      typ = if name="new_poly" then Poly
+            else if name="el_at_ind" then Float
+            else Void;
+      fname = name;      
+      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
+                else if name="el_at_ind" then [(Poly, "x");(Int, "y")] 
+                else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
 			                         ("printb", Bool);
 			                         ("printf", Float);
 			                         ("printbig", Int);
-						 ("printstr", String) ]
+						 ("printstr", String);
+             ("new_poly", Bool); 
+             ("el_at_ind", Bool) ] 
   in
 
   (* Add function name to symbol table *)
@@ -136,6 +142,7 @@ let check (globals, functions) =
           let ty = match op with
             Add | Sub | Mult | Div | Exp when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div | Exp when same && t1 = Float -> Float
+          | Add | Sub | Mult | Div when same && t1 = Poly -> Poly
           | Exp when false==same-> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq

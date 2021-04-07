@@ -1,0 +1,10 @@
+def int main()
+{
+  poly poly1;
+
+  poly1 = new_poly([1.1, 2.1, 4.0], [2, 1, 0]);
+
+  printf(el_at_ind(poly1, 1));
+
+  return 0;
+}

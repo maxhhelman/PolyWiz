@@ -237,8 +237,10 @@ let translate (globals, functions) =
 	  | A.Compo    -> let poly_composition_external_func = L.declare_function "poly_composition" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
                     L.build_call poly_composition_external_func [| e1'; e2' |] "poly_composition_llvm" builder
     | A.Exp     -> raise (Failure "internal error: semant should have rejected ^ on poly")
-	  | A.Equal   -> raise (Failure "need to implement")
-	  | A.Neq     -> raise (Failure "need to implement")
+	  | A.Equal   -> let equal_compare_poly_external_func = L.declare_function "equal_compare_poly" (L.function_type i1_t [|poly_t; poly_t|]) the_module in
+                    L.build_call equal_compare_poly_external_func [| e1'; e2' |] "equal_compare_poly_llvm" builder
+	  | A.Neq   -> let nequal_compare_poly_external_func = L.declare_function "nequal_compare_poly" (L.function_type i1_t [|poly_t; poly_t|]) the_module in
+                    L.build_call nequal_compare_poly_external_func [| e1'; e2' |] "nequal_compare_poly_llvm" builder
 	  | A.Less    -> raise (Failure "internal error: semant should have rejected > on poly")
 	  | A.Leq     -> raise (Failure "internal error: semant should have rejected <= on poly")
 	  | A.Greater -> raise (Failure "internal error: semant should have rejected > on poly")

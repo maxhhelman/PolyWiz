@@ -8,7 +8,7 @@ def int main()
   denominator = 2.0;
   poly_quotient = poly1 / denominator;
 
-  printf(el_at_ind(poly_quotient, 2));
+  printf(poly_at_ind(poly_quotient, 2));
 
   return 0;
 }

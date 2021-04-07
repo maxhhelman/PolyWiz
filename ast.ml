@@ -3,7 +3,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or | Exp | Compo | Eval
 
-type uop = Neg | Not | Abs
+type uop = Neg | Not | Abs | Const_ret
 
 type typ = Int | Bool | Float | Void | String | Array of typ | Poly
 
@@ -68,10 +68,12 @@ let string_of_op = function
     Neg -> "-"
   | Not -> "not "
   | Abs -> "| "
+  | Const_ret -> "# "
 
   let string_of_2nd_uop = function
     Neg -> ""
   | Not -> ""
+  | Const_ret -> ""
   | Abs -> " |"
 
 let rec string_of_expr = function

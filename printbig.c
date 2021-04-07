@@ -207,12 +207,11 @@ double* poly_multiplication(double *poly1, double *poly2){
 
 double* constants_retriever(double *poly){
   int poly_order = order(poly);
-  double *poly_consts = malloc((poly_order+2) * sizeof (double));
+  double *poly_consts = malloc((poly_order+1) * sizeof (double));
   
-  // full in the poly consts array
+  // fill in the poly consts array
   for (int i = 0; i<=poly_order; i++)
     poly_consts[i] = poly[i];
-  poly_consts[poly_order+1] = DBL_MIN;
 
   return poly_consts;
 
@@ -410,14 +409,7 @@ char* poly_to_tex(double *poly){
 }
 
 //get poly const at ind
-double el_at_ind(double *poly, int ind){
-  /*
-  int poly_order = order(poly);
-
-  if(ind>poly_order)
-    return 9999.9;
-  */
-  
+double poly_at_ind(double *poly, int ind){  
   return poly[ind];
 }
 

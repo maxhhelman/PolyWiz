@@ -35,13 +35,13 @@ let check (globals, functions) =
   let built_in_decls =
     let add_bind map (name, ty) = StringMap.add name {
       typ = if name="new_poly" then Poly
-            else if name="el_at_ind" then Float
+            else if name="poly_at_ind" then Float
             else if name="to_str" then String
             else if name="order" then Int
             else Void;
       fname = name;      
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
-                else if name="el_at_ind" then [(Poly, "x");(Int, "y")] 
+                else if name="poly_at_ind" then [(Poly, "x");(Int, "y")] 
                 else if name="to_str" then [(Poly, "x")] 
                 else if name="order" then [(Poly, "x")] 
                 else  [(ty, "x")];
@@ -54,7 +54,7 @@ let check (globals, functions) =
              ("new_poly", Bool); 
              ("to_str", Bool); 
              ("order", Bool); 
-             ("el_at_ind", Bool) ] 
+             ("poly_at_ind", Bool) ] 
   in
 
   (* Add function name to symbol table *)
@@ -134,6 +134,7 @@ let check (globals, functions) =
             Neg when t = Int || t = Float -> t
           | Not when t = Bool -> Bool
           | Abs when t = Int || t = Float -> t
+          | Const_ret when t = Poly -> Array(Float)
           | _ -> raise (Failure ("illegal unary operator " ^
                                  string_of_uop op ^ string_of_typ t ^
                                  " in " ^ string_of_expr ex))

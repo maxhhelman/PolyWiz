@@ -37,11 +37,13 @@ let check (globals, functions) =
       typ = if name="new_poly" then Poly
             else if name="el_at_ind" then Float
             else if name="to_str" then String
+            else if name="order" then Int
             else Void;
       fname = name;      
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
                 else if name="el_at_ind" then [(Poly, "x");(Int, "y")] 
                 else if name="to_str" then [(Poly, "x")] 
+                else if name="order" then [(Poly, "x")] 
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -51,6 +53,7 @@ let check (globals, functions) =
 						 ("printstr", String);
              ("new_poly", Bool); 
              ("to_str", Bool); 
+             ("order", Bool); 
              ("el_at_ind", Bool) ] 
   in
 

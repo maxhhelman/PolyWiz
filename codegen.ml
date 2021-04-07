@@ -217,8 +217,10 @@ let translate (globals, functions) =
         let e1' = expr builder e1
         and e2' = expr builder e2 in
         (match op with
-          A.Div -> let poly_division_external_func = L.declare_function "poly_division" (L.function_type poly_t [|poly_t; float_t|]) the_module in
+            A.Div -> let poly_division_external_func = L.declare_function "poly_division" (L.function_type poly_t [|poly_t; float_t|]) the_module in
                     L.build_call poly_division_external_func [| e1'; e2' |] "poly_division_llvm" builder
+          | A.Eval -> let eval_poly_external_func = L.declare_function "eval_poly" (L.function_type float_t [|poly_t; float_t|]) the_module in
+                    L.build_call eval_poly_external_func [| e1'; e2' |] "eval_poly_llvm" builder
           | _ -> raise (Failure "This operation is invalid for a poly and float operand.")
         )
 

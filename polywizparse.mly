@@ -8,7 +8,7 @@ open Ast
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token LBRACK RBRACK 
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF STRING POLY
-%token EXP ABS COMPO
+%token EXP ABS COMPO EVAL
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT SLIT
@@ -28,6 +28,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %left EXP
+%left EVAL
 %left COMPO
 %right NOT
 %nonassoc LBRACK 
@@ -118,6 +119,7 @@ expr:
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr EXP expr { Binop($1, Exp,   $3)   }
   | expr COMPO expr { Binop($1, Compo,   $3)   }
+  | expr EVAL expr { Binop($1, Eval,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }

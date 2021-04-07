@@ -362,6 +362,8 @@ char* poly_to_str(double *poly){
     }
   }
 
+  //printf(poly_string);
+
   return poly_string;
 
 }

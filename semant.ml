@@ -36,10 +36,12 @@ let check (globals, functions) =
     let add_bind map (name, ty) = StringMap.add name {
       typ = if name="new_poly" then Poly
             else if name="el_at_ind" then Float
+            else if name="to_str" then String
             else Void;
       fname = name;      
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
                 else if name="el_at_ind" then [(Poly, "x");(Int, "y")] 
+                else if name="to_str" then [(Poly, "x")] 
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -48,6 +50,7 @@ let check (globals, functions) =
 			                         ("printbig", Int);
 						 ("printstr", String);
              ("new_poly", Bool); 
+             ("to_str", Bool); 
              ("el_at_ind", Bool) ] 
   in
 
@@ -105,15 +108,14 @@ let check (globals, functions) =
       | Sliteral l -> (String, SSliteral l)
       | ArrayLit l ->        
       if List.length l > 0 then 
-          let typ = (List.nth l 0) in
-          let new_typ = typ in 
           let l' = List.map expr l in
-          match new_typ with
-           Literal _ -> (Array(Int), SArrayLit l') 
-          |Fliteral  _ -> (Array(Float), SArrayLit l')
-          |BoolLit  _ -> (Array(Bool), SArrayLit  l') 
-          |Sliteral _ -> (Array(String), SArrayLit l') 
-          | _ ->  raise (Failure ("not a valid array type"))
+          let array_type = (List.nth l' 0) in
+          match array_type with
+            (Int,_) -> (Array(Int), SArrayLit l') 
+          | (Float,_) -> (Array(Float), SArrayLit l')
+          | (Bool,_) -> (Array(Bool), SArrayLit  l') 
+          | (String,_) -> (Array(String), SArrayLit l') 
+          |  _ ->  raise (Failure ("not a valid array type"))
       else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)

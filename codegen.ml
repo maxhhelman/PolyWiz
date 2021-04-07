@@ -194,21 +194,21 @@ let translate (globals, functions) =
     in
 
     (* Construct code for an expression; return its value *)
-    let rec expr builder ((_, e) : sexpr) = match e with
+    let rec expr builder ((ast_typ, e) : sexpr) = match e with
 	SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SSliteral l -> L.build_global_stringptr ( String.sub l 1 ((String.length l) - 2)) "str" builder
       | SFliteral l -> L.const_float_of_string float_t l
       | SArrayLit l -> 
-        let e = (List.nth l 0) in
-        let arr_element_type = function
-            (A.Int, SLiteral _)  -> A.Int
-          | (A.Float, SFliteral _) -> A.Float 
-          | (A.Bool, SBoolLit _) -> A.Bool
-          | (A.String, SSliteral _) -> A.String 
+        let l' = (List.map (expr builder) l) in
+        let arr_element_type = function 
+            A.Array(A.Int) -> A.Int 
+          | A.Array(A.Float) -> A.Float
+          | A.Array(A.Bool) -> A.Bool
+          | A.Array(A.String) -> A.String
           | _ -> raise (Failure ("Invalid array type")) in
-        let array_type = arr_element_type e in
-        instantiate_arr array_type (List.map (expr builder) l) builder
+        let array_type = arr_element_type ast_typ in
+        instantiate_arr array_type l' builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
@@ -360,6 +360,9 @@ let translate (globals, functions) =
       | SCall ("el_at_ind", [e1;e2]) ->
         let el_at_ind_external_func = L.declare_function "el_at_ind" (L.function_type float_t [|poly_t; i32_t|]) the_module in
         L.build_call el_at_ind_external_func [| expr builder e1; expr builder e2 |] "el_at_ind_llvm" builder
+      | SCall ("to_str", [e]) ->
+        let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
+        L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

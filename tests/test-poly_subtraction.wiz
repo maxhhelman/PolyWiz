@@ -8,7 +8,7 @@ def int main()
   poly2 = new_poly([1.3, -1.0, 3.2, 0.0], [3, 2, 1, 0]);
   poly_diff = poly1 - poly2;
 
-  printf(el_at_ind(poly_diff, 3));
+  printf(poly_at_ind(poly_diff, 3));
 
   return 0;
 }

@@ -265,7 +265,8 @@ let translate (globals, functions) =
 	  | A.Leq     -> L.build_fcmp L.Fcmp.Ole e1' e2' "tmp" builder
 	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt e1' e2' "tmp" builder
 	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge e1' e2' "tmp" builder
-	  | A.And | A.Or -> raise (Failure "internal error: semant should have rejected and/or on float"))
+	  | A.And | A.Or -> raise (Failure "internal error: semant should have rejected and/or on float")
+    | _ -> raise (Failure "This operation is invalid for two float operands."))
 
         | SBinop (((A.Float,_ ) as e1), op, ((A.Int,_ ) as e2)) -> (* Binary op where e1 (float), e2 (int) *)
 	  let e1' = expr builder e1
@@ -285,7 +286,8 @@ let translate (globals, functions) =
 	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt e1' e2' "tmp" builder
 	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge e1' e2' "tmp" builder
 	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on float"))
+	      raise (Failure "internal error: semant should have rejected and/or on float")
+    | _ -> raise (Failure "This operation is invalid for these operands."))
 
         | SBinop (((A.Int,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (int), e2 (float) *)
 	  let e1' = expr builder e1
@@ -305,7 +307,8 @@ let translate (globals, functions) =
 	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt e1' e2' "tmp" builder
 	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge e1' e2' "tmp" builder
 	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on float"))
+	      raise (Failure "internal error: semant should have rejected and/or on float")
+    | _ -> raise (Failure "This operation is invalid for these operands."))
 
       | SBinop (e1, op, e2) -> (* Binary op where e1, e1 are both ints*)
 	  let e1' = expr builder e1
@@ -326,6 +329,7 @@ let translate (globals, functions) =
 	  | A.Leq     -> L.build_icmp L.Icmp.Sle e1' e2' "tmp" builder
 	  | A.Greater -> L.build_icmp L.Icmp.Sgt e1' e2' "tmp" builder
 	  | A.Geq     -> L.build_icmp L.Icmp.Sge e1' e2' "tmp" builder
+    | _ -> raise (Failure "This operation is invalid for these operands.")
 	  )
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
@@ -333,12 +337,17 @@ let translate (globals, functions) =
 	    A.Neg when t = A.Float -> L.build_fneg e' "tmp" builder
     | A.Neg                  -> L.build_neg e' "tmp" builder
     | A.Not                  -> L.build_not e' "tmp" builder
+    | A.Const_ret ->
+      let constants_retriever_external_func = L.declare_function "constants_retriever" (L.function_type float_arr_t [|poly_t|]) the_module in
+      L.build_call constants_retriever_external_func [| e' |] "constants_retriever_llvm" builder
     | A.Abs when t = A.Float ->
       let abs_external_func_floats = L.declare_function "abs_operator_float" (L.function_type float_t [|float_t|]) the_module in
       L.build_call abs_external_func_floats [| e' |] "abs_operator_float_llvm" builder
     | A.Abs                  ->
       let abs_external_func_ints = L.declare_function "abs_operator_int" (L.function_type i32_t [|i32_t|]) the_module in
-      L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder )
+      L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder 
+    | _ -> raise (Failure "This operation is invalid for these operands.")
+    )
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	    "printf" builder
@@ -357,9 +366,9 @@ let translate (globals, functions) =
         let len_e2 = L.const_int i32_t (list_length e2) in
         let new_poly_external_func = L.declare_function "new_poly" (L.function_type poly_t [|float_arr_t; i32_t; int_arr_t; i32_t|]) the_module in
         L.build_call new_poly_external_func [| e1'; len_e1; e2'; len_e2|] "new_poly_llvm" builder
-      | SCall ("el_at_ind", [e1;e2]) ->
-        let el_at_ind_external_func = L.declare_function "el_at_ind" (L.function_type float_t [|poly_t; i32_t|]) the_module in
-        L.build_call el_at_ind_external_func [| expr builder e1; expr builder e2 |] "el_at_ind_llvm" builder
+      | SCall ("poly_at_ind", [e1;e2]) ->
+        let poly_at_ind_external_func = L.declare_function "poly_at_ind" (L.function_type float_t [|poly_t; i32_t|]) the_module in
+        L.build_call poly_at_ind_external_func [| expr builder e1; expr builder e2 |] "poly_at_ind_llvm" builder
       | SCall ("order", [e]) ->
         let order_external_func = L.declare_function "order" (L.function_type i32_t [|poly_t|]) the_module in
         L.build_call order_external_func [| expr builder e |] "order_llvm" builder

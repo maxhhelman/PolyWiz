@@ -8,7 +8,7 @@ def int main()
   poly2 = new_poly([7.0, 4.0], [1, 0]);
   poly_composed = poly1 : poly2;
 
-  printf(el_at_ind(poly_composed, 1));
+  printf(poly_at_ind(poly_composed, 1));
 
   return 0;
 }

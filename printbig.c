@@ -109,7 +109,6 @@ int order(double *poly){
 }
 
 double* new_poly(double *consts, int consts_length, int *exponents, int exponents_length){
-
   //if unequal size of consts and exponents arrays
   if ( consts_length != exponents_length ) 
     return NULL;
@@ -123,14 +122,11 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
 
   //initialize the poly array with zeros
   double *poly_arr = malloc( (order+2) * sizeof (double));
-  for(int i=0; i <= order+1; i++){
-    if(i<=order)
+ 
+  for(int i=0; i <= order; i++)
       poly_arr[i] = 0.0;
-
-    //terminate the poly arr with DBL_MIN
-    else
-      poly_arr[i] = DBL_MIN;
-  }
+  //terminate the poly arr with DBL_MIN
+  poly_arr[order+1] = DBL_MIN;
 
   //fill poly array with inputted constants and exponents
   for(int i=0; i < exponents_length; i++){
@@ -252,6 +248,28 @@ bool equal_compare_poly(double *poly1, double *poly2){
   }
 
   return equal;
+
+}
+
+bool nequal_compare_poly(double *poly1, double *poly2){
+  int poly1_order = order(poly1);
+  int poly2_order = order(poly2);
+  
+  // check if all poly constants are equal
+  bool equal = true;
+  for (int i = 0; i<= (poly2_order>poly1_order ? poly2_order : poly1_order); i++){
+    if(poly1_order<=i && poly2[i]!=0.0){
+      equal=false;
+    }
+    else if(poly2_order<=i && poly1[i]!=0.0){
+      equal=false;
+    }
+    else if(poly1[i]!=poly2[i]){
+      equal = false;
+    }
+  }
+
+  return !equal;
 
 }
 
@@ -386,11 +404,13 @@ char* poly_to_tex(double *poly){
 
 //get poly const at ind
 double el_at_ind(double *poly, int ind){
+  /*
   int poly_order = order(poly);
 
   if(ind>poly_order)
-    return 0.0;
-
+    return 9999.9;
+  */
+  
   return poly[ind];
 }
 

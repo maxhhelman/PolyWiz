@@ -142,6 +142,7 @@ let check (globals, functions) =
           let ty = match op with
             Add | Sub | Mult | Div | Exp when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div | Exp when same && t1 = Float -> Float
+          | Add | Sub | Mult | Div when same && t1 = Poly -> Poly
           | Exp when false==same-> Float
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq

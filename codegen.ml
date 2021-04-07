@@ -69,11 +69,12 @@ let translate (globals, functions) =
 
   let initialize_array t el builder =
     let len = L.const_int i32_t (List.length el) in
+    (*raise (Failure (string_of_int ((List.length el))));*)
     let arr = create_array t len builder in
     let _ =
       let assign_value i =
         let index = L.const_int i32_t i in
-        let index = L.build_add index (L.const_int i32_t 1) "tmp" builder in
+        let index = L.build_add index (L.const_int i32_t 0) "tmp" builder in
         let _val = L.build_gep arr [| index |] "tmp" builder in
         L.build_store (List.nth el i) _val builder
       in
@@ -81,7 +82,8 @@ let translate (globals, functions) =
         ignore (assign_value i)
       done
     in
-    arr
+
+    arr 
   in
 
   let access_array arr index assign builder =
@@ -92,6 +94,21 @@ let translate (globals, functions) =
   in
 
 
+  let list_length e =
+    (match e with 
+      (_, SArrayLit(l)) -> List.length l
+      | _ -> 0
+    ) in
+  let list_ele e ind =
+    (match e with 
+      (A.Array(t), SArrayLit(l)) -> 
+        let l0=List.nth l ind in
+        (match l0 with 
+          (A.Int, SLiteral(inte)) -> inte
+          | _ -> 0
+        )
+      | _ -> 0
+    ) in
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -185,6 +202,25 @@ let translate (globals, functions) =
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+	  let e1' = expr builder e1
+	  and e2' = expr builder e2 in
+	  (match op with
+	    A.Add     -> let poly_addition_external_func = L.declare_function "poly_addition" (L.function_type poly_t [|poly_t; poly_t|]) the_module in
+                    L.build_call poly_addition_external_func [| e1'; e2' |] "poly_addition_llvm" builder
+	  | A.Sub     -> raise (Failure "need to implement")
+	  | A.Mult    -> raise (Failure "need to implement")
+	  | A.Div     -> raise (Failure "need to implement")
+    | A.Exp     -> raise (Failure "internal error: semant should have rejected ^ on poly")
+	  | A.Equal   -> raise (Failure "need to implement")
+	  | A.Neq     -> raise (Failure "need to implement")
+	  | A.Less    -> raise (Failure "internal error: semant should have rejected > on poly")
+	  | A.Leq     -> raise (Failure "internal error: semant should have rejected <= on poly")
+	  | A.Greater -> raise (Failure "internal error: semant should have rejected > on poly")
+	  | A.Geq     -> raise (Failure "internal error: semant should have rejected >= on poly")
+	  | A.And | A.Or ->
+	      raise (Failure "internal error: semant should have rejected and/or on poly"))
 
       | SBinop (((A.Float,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
 	  let e1' = expr builder e1
@@ -289,13 +325,9 @@ let translate (globals, functions) =
       | SCall ("printstr", [e]) ->
 	  L.build_call printf_func [| str_format_str ; (expr builder e) |] "printf" builder
       | SCall ("new_poly", [e1;e2]) ->
-        let list_length e =
-        (match e with 
-          (_, SArrayLit(l)) -> List.length l
-          | _ -> 0
-        ) in
         let e1' = expr builder e1 in
         let e2' = expr builder e2 in
+        (*raise (Failure (string_of_int (list_ele e2 0)));*)
         let len_e1 = L.const_int i32_t (list_length e1) in
         let len_e2 = L.const_int i32_t (list_length e2) in
         let new_poly_external_func = L.declare_function "new_poly" (L.function_type poly_t [|float_arr_t; i32_t; int_arr_t; i32_t|]) the_module in

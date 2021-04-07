@@ -1,7 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or | Exp
+          And | Or | Exp | Compo
 
 type uop = Neg | Not | Abs
 
@@ -60,6 +60,7 @@ let string_of_op = function
   | Geq -> ">="
   | And -> "and"
   | Or -> "or"
+  | Compo -> ":"
 
 
   let string_of_uop = function

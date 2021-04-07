@@ -313,9 +313,20 @@ double* poly_composition(double *poly1, double *poly2){
     current_term[current_term_order+1] = DBL_MIN;
 
     //foil this term
-    for(int j=i; j>0; j--){
+    for(int j=i; j>1; j--){
       current_term = poly_multiplication(current_term, poly2);
     }
+
+    //handle order 0 term special case
+    if(i==0)
+      current_term[0] = 1.0;
+
+    //multiply by poly1 constant for this term
+    double *multiplier = malloc((2) * sizeof (double));
+    multiplier[0] = poly1[i];
+    multiplier[1] = DBL_MIN;
+    current_term = poly_multiplication(current_term, multiplier);
+
     //add current term to the composed_poly
     composed_poly = poly_addition(composed_poly, current_term);
   }

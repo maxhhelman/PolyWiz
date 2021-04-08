@@ -1,0 +1,836 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{titlesec}
+
+\titleformat*{\section}{\LARGE\bfseries}
+\titleformat*{\subsection}{\Large\bfseries}
+\titleformat*{\subsubsection}{\large\bfseries}
+\titleformat*{\paragraph}{\large\bfseries}
+\titleformat*{\subparagraph}{\large\bfseries}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  numbers=left,
+  stepnumber=1,
+  firstnumber=1,
+  numberfirstline=true
+  escapeinside={|(}{)|}
+}
+
+\title{COMS 4115 Programming Languages and Translators \\ PolyWiz Language Reference Manual}
+\author{Aditya Kankariya, Anthony Pitts, Max Helman, Rose Chrin, Tamjeed Azad\\ \{ak4290, aep2195, mhh2148, crc2194, ta2553\}}
+\date{Spring 2021}
+
+\begin{document}
+\maketitle
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{polywizard.png}
+\label{fig_sim}
+\end{figure}
+\maketitle
+\tableofcontents
+
+\section{Overview of PolyWiz}
+\subsection{A Mathematician's Dream}
+PolyWiz is truly a mathematician's dream. The functionality of the language is intended to be similar to that of Mathematica. The primary goal is to support symbolic mathematics focused on polynomial functions. In addition, PolyWiz aims to provide unique \TeX\text{ }integration, allowing a user to not only perform numerical calculations but produce ready-to-show documents with plots. 
+
+\subsection{General Language Features}
+
+PolyWiz is a strongly, statically typed and statically scoped language. It will be pass by reference behind the scenes to the programmer. This will enhance memory in the long run given all of the types in the language are immutable. In addition, PolyWiz will assume that all variables are constant. The language will have syntax most similar to C, with some syntax having close similarity to Python as well. It will also assume all basic operations from C. 
+
+\section{Basic Syntax}
+\subsection{Comments}
+All comments are multiline, beginning with "/*" and ending with "*/".
+\begin{lstlisting}
+    /* PolyWiz is an incredible
+    programming language for
+    symbolic mathematics and
+    other fun things */
+    
+    /* OK let's write some code now */
+    string my_str = "I like PolyWiz"; /* But in reality, I love PolyWiz */
+    \end{lstlisting}
+
+The grammar parser never sees comments that are made in the code, as the scanner ensures that their contents are never tokenized.
+
+\subsection{Identifiers}
+Identifiers in PolyWiz denote variable and functions. All identifiers consist of ASCII letters (non case-sensitive) and decimal digits; no special characters are permitted other than underscores. The first character must be an ASCII letter, not a number or an underscore. Identifiers cannot be reserved keywords. Here are some permitted identifiers:
+\begin{lstlisting}
+    edwards_rocks, EdwardsRocks, plt_rocks, length_poly, cs_makes_me_1000000dollars
+    \end{lstlisting}
+Here are examples of identifiers that are not allowed:
+\begin{lstlisting}
+    4115_rocks, cs_makes_me_$1000000
+    \end{lstlisting}
+
+In the grammar parser, these are denoted by the token \lstinline{ID}.
+
+\subsection{Reserved Keywords}
+Keywords and built-in functions in PolyWiz are reserved identifiers that cannot be used for any other purpose. PolyWiz has the following keywords:
+\begin{lstlisting}
+    for, and, or, not, return, length if, else, elif, def, void, print, printf, printb, printstr, order, poly_at_ind, new_poly, to_str, tex_document, plot, int, string, float, array, poly, in
+    \end{lstlisting}
+
+In the grammar parser, these are all denoted by capitalized letters of their words, for example \lstinline{NOT, IF, POLY}.
+
+\subsection{Braces}
+PolyWiz uses braces to group statements and enforce static scoping. Whitespace (specifically empty lines, tabs, and extra spaces) is ignored. Control flow keywords must be followed by braces. Here is some sample code that demonstrates the proper use of braces:
+\begin{lstlisting}
+    /* Pretty code that works */
+    if (i > 27){
+    print("i is greater than 27");
+    }
+    \end{lstlisting}
+Meanwhile, this code is a poor stylistic choice but is equivalent to the previous code:
+\begin{lstlisting}
+    /* Ugly code that works */
+    if          (i          > 27
+    )                   {
+    print(
+    
+    "i is greater than 27");}
+    \end{lstlisting}
+This code is not correct because it does not have the requisite braces after the if statement:
+\begin{lstlisting}
+    /* Pretty code that does not work */
+    if (i > 27)
+        print("i is greater than 27");
+    \end{lstlisting}
+
+In the parser, these are denoted by \lstinline{LBRACE} and \lstinline{RBRACE}.
+
+\subsection{Parentheses}
+Parentheses are used to override default precedence; anything inside parentheses automatically becomes the highest precedence.
+\begin{lstlisting}
+    /* Parentheses example */
+    int a = 1 + 2 * 3; /* a = 7 */
+    int b = (1 + 2) * 3; /* b = 9 */
+    \end{lstlisting}
+    \subsection{Sequencing, $;$}
+    \textbf{Return Type:}\text{ $<T>$ where T is type of RHS expression's return value}\\
+    \textbf{Operand:}\text{ Two expressions on each side of ; operator}\\
+    \textbf{Operation Logic:}\text{ Evaluates the LHS expression, followed by the RHS expression.}\\
+    \begin{lstlisting}
+    /* ; operator example */
+    a = 5; 6 /* returns the value 6 after assigning a = 5 */
+    \end{lstlisting}
+
+In the parser, these are denoted by \lstinline{LPAREN} and \lstinline{RPAREN}.
+
+\section{Data Types and Literals}
+\subsection{Mutability}
+All data types in PolyWiz are inherently immutable; rather, variable assignment and reassignment are supported. PolyWiz is pass-by-reference.
+\subsection{Literals}
+The language supports literals of type int, boolean, float, and string. See data types section for details of these.
+
+The int literal is represented as a sequence of digits from the set [0,9], and is representative of the int data type. 
+
+Representative regular expression: ['0'-'9']+
+
+The string literal is represented as a sequence of ASCII characters, not starting with a number but can include numbers. It is representative of the string data type.
+
+Representative regular expression: [string regex]
+
+The float is represented as a sequence of digits, with a single decimal point within the sequence body, with this sequence of digits possibly raised to some exponent. It is representative of the float data type.
+
+Representative regular expression: [float regex]
+
+The boolean literal is represented by the keywords 'True' and 'False'; it represents the boolean data type.
+
+Representative regular expression: [boolean regex]
+\subsection{Primitive Data Types}
+The language supports primitive data types of int, float, and booleans, and additionally supports type string and array. Using floats and arrays as building blocks, the language fundamentally supports a new type named poly. Additional types will be defined as needed.
+
+Primitive data types are all immutable in this language. When say, a variable is assigned one of these type values and it is changed, a completely new value is assigned and the old one is discarded.
+\subsection{Booleans}
+The boolean type can only have two values, true or false. This takes up 4 bytes of memory and supports the boolean operations and,or,$<$,$>$,$<=$,$>$=. Implementation could simply be an int of value 0 or 1 for false and true, respectively under the hood, but other implementations are also possible. 
+
+Examples:
+
+\begin{lstlisting}
+boolean x = True;
+if (not x) {
+	print("x is not true");
+}
+\end{lstlisting}
+\subsubsection{Ints}
+The int type represents numerical integers and takes up 4 bytes of memory. Syntax and operations are mostly C-like, specifically supporting the operations
++,-,*,/,\%,=,+=,-=,*=,/=. Additionally, int supports the boolean operations and,or,$<$,$>$,$<=$,$>$=.
+
+Examples: 
+
+\begin{lstlisting}
+/* examples of ints: 4, 23, -5623 */
+int x = 57;
+x = x + 9; /* integer addition */
+\end{lstlisting}
+\subsubsection{Floats}
+This float type represents floating point numbers, used to approximate non-integer real numbers. Using 8 bytes of space, implemented using IEEE 754-1985 double precision standard, it can precisely approximate real numbers in the range of $\pm 2.23\times 10^{-308}$ to $\pm 1.80\times 10^{308}$. It supports all operations that the int type supports.
+
+The support for very large and very small numbers eliminates the need for types such as long and short. When these boundaries are exceeded, the language simply returns an overflow error.
+
+These values use the same symbols for operations as the int type. Operations can occur between ints and floats, which would return a float. See operators section for more details.
+
+Examples:
+
+\begin{lstlisting}
+/* examples of float: -8.4, 71234.98, 1.234 * 10^59 */
+float x = 4.0;
+x = x * 3.5; /* multiplying floats */
+\end{lstlisting}
+\subsubsection{Strings}
+The string type represents a concatenated, immutable block of either ASCII characters. It uses memory dynamically based on the size of string, and generally supports operations supported by Python's str type, including concatenation, indexing and reversal. They are declared and specified in the language using either double quotes or single quotes.
+
+It is important to note that this language does not support the char type common to languages such as C and Java; all single chars are of type string with length 1.
+
+\begin{lstlisting}
+string x = "stephen";
+x = x + " " + "edwards" /* concatenation of strings */
+\end{lstlisting}
+\subsection{Arrays}
+The array type is specified using $[type]$, and does not have mutable length and uses C-like syntax. Arrays can only consist of a single type and are immutable. Only 1D arrays are supported.
+
+\begin{lstlisting}
+
+[ float ] x = [ 4.5, 9.6, 3.2, 4.9 ];
+
+for number in x {
+	print(number);
+}
+
+\end{lstlisting}
+\subsection{The Poly Data Type}
+The poly data type is the centerpiece of the PolyWiz language. Much of Polywiz's standard library and operations, such as addition (+), multiplication (*), composition (@), plotting (plot()), are built around functionality with the type poly. The poly type specifies polynomials using an array of floats as variable coefficients and an array of ints for variable exponents, used in tandem to define polynomial functions. Polynomials can only be defined in terms of a single variable, say $x$, and they are instantiated in the following way:
+\subsubsection{Implementation}
+Create a new polynomial of the type \textit{poly}. The first argument is a single list of coefficients of type \textit{float} for each term. The second argument is a single list of exponents of type \textit{int} for each respective term. Both lists should align and be of the same length, meaning that the \textit{i}'th value in both \textit{coefficients} and \textit{exponents} correspond to the same term. This function is linked to the C standard library under the hood in order to create a variable of type \textit{Poly}, which is represented with some form of a dictionary.
+    \begin{lstlisting}
+    /* Example of new_poly */
+    poly poly1 = new_poly([1.0, 2.0, 4.0], [3, 2, 1]); /* poly1 = x^3 + 2x^2 + 4x */
+    poly poly2 = new_poly([1.0], [1.0]); /* poly2 = x */
+    \end{lstlisting}
+This instantiates the polynomials $1.0x^{3} + 2.0x^{2} + 4.0x^{1}$ and $1.0x^{1}$. \\
+\subsubsection{\textit{p}.order()}
+Return an integer containing the order/degree of polynomial \textit{p} of type poly.
+    \begin{lstlisting}
+    /* Example of order */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly1 = x^2 + 2x + 3 */
+    int poly1_order = poly1.order(); /* poly1_order = 2 */
+    \end{lstlisting}
+
+\subsection{Data Types in PolyWiz Grammar}
+
+Each of float, int, boolean, string, are all tokenized as literals of their type in the grammar parser (\lstinline{BLIT, FLIT, SLIT}), and they each also have a separate token for their types, such as \lstinline{FLOAT, INT, BOOL}. The poly type has a \lstinline{POLY} token for its type, but its 'literal' is handled differently as instantiation is handled via the new\_poly function, and is generalized under \lstinline{expr}. All types of arrays have their own literal token, such as \lstinline{FLOAT_ARR_LIT}, \lstinline{STRING_ARR_LIT} and a token for their specific types, such as \lstinline{FLOAT_ARR}.
+
+\section{Statements and Expressions}
+\subsection{Statements}
+ A PolyWiz program is made up of a combination of the following types of statements: \\
+    \textbf{Expressions, Variable assignments, Return statements, Function definitions, Function calls, If-elif-else statements, For loops} 
+\subsubsection{If-Elif-Else Statements}
+If-elif-else statements are used to make decisions based on the expression (condition) being evaluated. If a condition evaluates to true, the statements inside the if statement are evaluated, otherwise the program will either move on or evaluate an optional else statement as shown below. Any expression must evaluate to a valid boolean (true/false) in order to compile. The condition must be wrapped in parenthesis.
+\begin{lstlisting}
+    /* Example of if/elif/else control flow */
+    int x = 5;
+    if (x > 100) { /* False, so program moves onto elif statement */
+        print("x is greater than 100");
+    }
+    elif (x > 10) { /* False, so program moves onto else statement */
+        print("x is greater than 10");
+    }
+    else {
+        print("x is less than or equal to 10"); /* This is what the program outputs */
+    }
+    \end{lstlisting}
+\subsubsection{For Loops}
+ For loops in PolyWiz are incredibly similar to C: they are contained in parenthesis, and consist of a variable initialized to some initial variable followed by a semicolon, then a breaking condition followed by a semicolon, and finally an update rule for the variable. keyword to return control to the beginning of the loop for the next item in the sequence. You can modify all the variables in an array by iterating over the indices of the array.
+    \begin{lstlisting}
+    /* To print out all the items in an array of integers until we see an integer greater than 10 */
+    for (int i = 0; i < length(my_array); i++) {
+        if(my_array[i] < 10) {
+            print(my_array[i]);
+        }
+        element = 0; /* This will not affect my_array */
+    } 
+    
+    /* To print out every even integer between 0 and 9 */
+    for (int i = 1; i < 10; i = i + 2) {
+        print(i);
+    }
+    
+    /* To iterate over the indices of a sequence, you can combine a for loop with length() */
+    for (int i = 0; i < length(my_array); i++) { 
+        print(my_array[i]);
+    }
+    \end{lstlisting}
+\subsection{Expressions and Operators}
+Our language supports elementary unary and binary operators to accomplish a plethora of tasks.
+\subsubsection{Unary Operators}
+In the parser, this is represented by 
+
+$|$ Unop\_right expr * operation * operation
+
+and by 
+
+$|$ Unop\_left operation * expr
+There is only one operation whose operation is to the left of the expression, and that is the logical not operation, denoted by the keyword 'not'. 
+\subsubsection{Binary Operators}
+In the parser, this is generally represented by
+
+$|$ Binop expr * operation * expr
+
+There are several operators that evaluate via these scheme.
+
+Binary arithmetic operators are +,-,*,/,and $\%$. These all directly return a new expression literal based on expression type, usually ints or floats; a notable exception is the string type, which uses '+' for concatenation.
+
+We have logical operators that can be nested to represent complex boolean expressions; these logical operators are the logical $\land$ and $\lor$ operations, and and or. 
+
+We have comparison operations (essential for things like control flow) that always return booleans. These are $==$, $!=$, $>$, $<$, $>=$, and $<=$. 
+
+For assignment, the parser specifically represents this by 
+
+$|$ Assign var * operation * expr
+
+Binary assignment operators are used to assign values to variables. 
+\subsection{Operations}
+    
+    \subsubsection{Addition, +}
+    \textbf{Return Type:}\text{ $<T>$ where T is the type of both operands}\\
+    \textbf{Operands:}\text{ Two variables of type $<T>$ on both sides of the addition operator (+)}\\
+    \textbf{Operation Logic:}\text{ Returns the sum, which could be the polynomial sum, of the two operands.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left PLUS}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr PLUS  expr \{ Binop$($\$1, Add, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* + operator example */
+    poly poly1 = new_poly([2.0, 4.0, 2.0], [2, 1, 0]); /* poly1 = 2x^2 + 4x + 2 */
+    poly poly2 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly2 = x^2 + 2x + 3 */
+    poly poly_sum = poly1 + poly2; /* poly_sum = 3x^2 + 6x + 5 */
+    \end{lstlisting}
+    
+    \subsubsection{Subtraction, -}
+    \textbf{Return Type:}\text{ $<T>$ where T is the type of all operands}\\
+     \textbf{Operands:}\text{ One or Two variables of type $<T>$, with at least one variable on the RHS of the subtraction operator (-)}\\
+     \textbf{Operation Logic:}\text{ Returns the difference, which could be of polynomials, of the two operands.}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad If only one operand is supplied, it returns -1.0 * operand.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left MINUS}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr MINUS  expr \{ Binop$($\$1, Sub, \$3$)$  \}}\\
+     \begin{lstlisting}
+     /* - operator example */
+     poly poly1 = new_poly([2.0, 4.0, 2.0], [2, 1, 0]); /* poly1 = 2x^2 + 4x + 2 */
+     poly poly2 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly2 = x^2 + 2x + 3 */
+     poly poly_difference = poly1 - poly2; /* poly_difference = x^2 + 2x - 1 */
+    \end{lstlisting}
+
+    \subsubsection{Multiplication, *}
+    \textbf{Return Type:}\text{ $<T>$ where T is the type of both operands}\\
+    \textbf{Operands:}\text{ Two variables of type $<T>$ on both sides of the multiplication operator (*)}\\
+    \textbf{Operation Logic:}\text{ Returns the two operands' product, which could be polynomial multiplication.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left TIMES}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr TIMES  expr \{ Binop$($\$1, Mult, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* * operator example */
+    poly poly1 = new_poly([1.0], [1]); /* poly1 = x */
+    poly poly2 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly2 = x^2 + 2x + 3 */
+    poly poly_product = poly1 * poly2; /* poly_product = x^3 + 2x^2 + 3x */
+    \end{lstlisting}
+    
+    \subsubsection{Division, /}
+    \textbf{Return Type:}\text{ $<T>$ where T is the type of the first operand}\\
+    \textbf{Operands:}\text{ Two variables of type $<T>$ on both sides or a Poly type on the LHS and a float on the RHS}\\
+    \text{\quad\quad\quad\quad\quad\quad\quadof the division operator (/). Polys can only be divided by a float, not another poly.}\\
+    \textbf{Operation Logic:}\text{ Returns the first operand divided by the second.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left DIVIDE}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr DIVIDE  expr \{ Binop$($\$1, Div, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* / operator example */
+    poly poly1 = new_poly([1.0], [2]); /* poly1 = x^2 */
+    float denominator = 2.0; /* poly2 = x */
+    poly poly_div = poly1 / denominator; /* poly_div = .5x^2 */
+    \end{lstlisting}
+    \subsubsection{Constants Retriever, \#}
+    \textbf{Return Type:}\text{ [ float ]}\\
+    \textbf{Operand:}\text{ Poly variable on left side of the operator (\#)}\\
+    \textbf{Operation Logic:}\text{ Returns an array of the polynomial constants, from highest to lowest order.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left CONST\_RETRIEVER}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr CONST\_RETRIEEVER \{ Unop$($Const\_retriever, \$1$)$  \}}\\
+    \begin{lstlisting}
+    /* # operator example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); // poly1 = x^2 + 2x + 3
+    [float] poly1_consts = poly1# ; // poly1_consts = [[1.0, 2.0, 3.0],[2, 1, 0]]
+    \end{lstlisting}
+    
+    \subsubsection{Polynomial Composition, :}
+    \textbf{Return Type:}\text{ poly }\\
+    \textbf{Operands:}\text{ Two poly variables on the left and right side of the composition operator (:)}\\
+    \textbf{Operation Logic:}\text{ Returns the polynomial that forms by composing the polynomial on the left hand side of}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad  the : operator with the second polynomial, on the right hand side.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left COMP\_POLY}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr COMP\_POLY  expr \{ Binop$($\$1, Comp\_poly, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* : operator example, composing a poly with another poly */
+    poly poly1 = new_poly([1.0], [2]); /* poly1 = x^2 */
+    poly poly2 = new_poly([1.0], [2]); /* poly2 = x^2 */
+    poly poly_composed = poly1 : poly2; /* poly_composed = (x^2)^2 = x^4 */
+    \end{lstlisting}
+    
+    \subsubsection{Polynomial Evaluation, @}
+    \textbf{Return Type:}\text{ float }\\
+    \textbf{Operands:}\text{ One Poly and one float/int variable on the left and right side, respectively, of the @ operator}\\
+    \textbf{Operation Logic:}\text{ Returns the value of the polynomial at the float/int location specified.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left EVAL\_POLY}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr EVAL\_POLY  expr \{ Binop$($\$1, Eval\_poly, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* @ operator example, evaluating a poly at a specified independent variable location */
+    poly poly1 = new_poly([1.0], [2]); /* poly1 = x^2 */
+    float poly1_value = poly1 @ 2; /* poly1_val = 4.0 */
+    \end{lstlisting}
+    
+    \subsubsection{Convert Polynomial to String, to\_str}
+    \textbf{Return Type:}\text{ string }\\
+    \textbf{Operand:}\text{ Poly variable}\\
+    \textbf{Operation Logic:}\text{ Returns a string representation of the polynomial.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left TO\_STR}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad TO\_STR LPAREN expr RPAREN \{ Make\_str$($\$3$)$  \}}\\
+    \begin{lstlisting}
+    /* # operator example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly1 = x^2 + 2x + 3 */
+    string poly1_str = to_str(poly1); /* poly1_str = "x^2+2x+3" */
+    \end{lstlisting}
+    
+    \subsubsection{Power, \^{}}
+    \textbf{Return Type:}\text{ float/int }\\
+    \textbf{Operand:}\text{ Two floats/ints on each side of the power operator (\^{})}\\
+    \textbf{Operation Logic:}\text{ Returns the left hand side float/int raised to the right hand side float/int.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left EXP}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr EXP  expr \{ Binop$($\$1, Exp, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* ^ operator example */
+    float power_result = 2.0 ^ 3.0; /* power_result = 8.0 */
+    \end{lstlisting}
+    
+    \subsubsection{Absolute Value, $\|$}
+    \textbf{Return Type:}\text{ float/int }\\
+    \textbf{Operand:}\text{ A float/int inside the absolute value operator bars ($\|$)}\\
+    \textbf{Operation Logic:}\text{ Returns the absolute value of the float/int inside the absolute value bars.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left ABS\_VALUE}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad ABS\_VALUE expr ABS\_VALUE \{ Unop$($Abs\_value, \$1$)$  \}}\\
+    \begin{lstlisting}
+    /* | | operator example */
+    float abs_value_result = |-2.0|; /* abs_value_result = 2.0
+    \end{lstlisting}
+    
+    \subsubsection{Assignment, $=$}
+    \textbf{Return Type:}\text{ void }\\
+    \textbf{Operand:}\text{ A string on the LHS and a type $<T>$ on the RHS of the = operator}\\
+    \textbf{Operation Logic:}\text{ If the RHS is a primitive, it stores the RHS' value into a variable, named the LHS string value. }\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad Otherwise, it stores the RHS' pointer location into a variable, named the LHS string value}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%right ASSIGN}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad ID ASSIGN  expr \{ Assign$($\$1, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* = operator example */
+    a = 5; /* Stores value 5 in variable "a" */
+    
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]);
+    poly poly2 = poly1; /* poly2 holds a pointer to poly1 */
+    \end{lstlisting}
+    
+    \subsubsection{Boolean Negation, not}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ A boolean on the RHS of the not operator}\\
+    \textbf{Operation Logic:}\text{ Returns the opposite boolean value as the operand.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%right NOT}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad NOT expr \{ Unop$($Not, \$1$)$  \}}\\
+    \begin{lstlisting}
+    /* not operator example */
+    a = not 1==1 ; /* a = false */
+    \end{lstlisting}
+    
+    \subsubsection{Equality Comparison, ==}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two values of type $<T>$ on each side of the == operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if both operands are of equal value.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left EQ}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr EQ  expr \{ Binop$($\$1, Equal, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* == operator example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]);
+    poly poly2 = poly1;
+    a = poly1 == poly2; /* a = true */
+    \end{lstlisting}
+    
+    \subsubsection{Less than comparison, $<$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two values of type $<T>$ on each side of the $<$ operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if LHS is strictly less than RHS.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left LT}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr LT  expr \{ Binop$($\$1, Less, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* < operator example */
+    a = 1 < 1; /* a = false */
+    \end{lstlisting}
+    
+    \subsubsection{Less than or equal to comparison, $<=$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two values of type $<T>$ on each side of the $<=$ operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if LHS is less than or equal to RHS.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left LEQ}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr LEQ  expr \{ Binop$($\$1, Leq, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* <= operator example */
+    a = 1 <= 1; /* a = true */
+    \end{lstlisting}
+    
+    \subsubsection{Greater than comparison, $>$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two values of type $<T>$ on each side of the $>$ operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if LHS is strictly greater than RHS.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left GT}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr GT  expr \{ Binop$($\$1, Greater, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* > operator example */
+    a = 1 > 1; /* a = false */
+    \end{lstlisting}
+    
+    \subsubsection{Greater than or equal to comparison, $>=$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two values of type $<T>$ on each side of the $>=$ operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if LHS is greater than or equal to RHS.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left GEQ}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr GEQ  expr \{ Binop$($\$1, Geq, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* >= operator example */
+    a = 1 >= 1; /* a = true */
+    \end{lstlisting}
+    
+    \subsubsection{Boolean or, $or$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two boolean values on each side of the or operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if LHS or RHS is true.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left OR}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr OR  expr \{ Binop$($\$1, Or, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* or operator example */
+    a = true or false; /* a = true */
+    \end{lstlisting}
+    
+    \subsubsection{Boolean and, $and$}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ Two boolean values on each side of the or operator}\\
+    \textbf{Operation Logic:}\text{ Returns True if both the LHS and RHS is true.}\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left AND}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr AND  expr \{ Binop$($\$1, And, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* and operator example */
+    a = true and false; /* a = false */
+    \end{lstlisting}
+    
+    \subsubsection{Membership, in}
+    \textbf{Return Type:}\text{ boolean }\\
+    \textbf{Operand:}\text{ A value on the left-hand side and an array or string on the right-hand side }\\
+    \textbf{Operation Logic:}\text{ Returns true if the specified value is a member of the array or a substring of the string; false otherwise }\\
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\%left IN}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr IN  expr \{ Binop$($\$1, InArray, \$3$)$  \}}\\
+    \begin{lstlisting}
+    /* in example */
+    [int] arr = [5,6,7,8,9];
+    print(4 in arr); /* prints false */
+    print(5 in arr); /* prints true */
+    
+    string s = "edwards";
+    print("ed" in s); /* prints true */
+    print("eddy" in s); /* prints false */
+    \end{lstlisting}
+\subsection{Operator Precedence}
+
+\text{This operator precedence table specifies, in increasing order, the compiler's priority and associativity for each operator.}\\
+\begin{center}
+\resizebox{.6\textwidth}{!}{
+  \begin{tabular}{ | l | c | r | }
+\hline
+\textbf{Operator} & \textbf{Meaning} & \textbf{Associativity} \\ \hline
+; & Sequencing & Left to Right \\ \hline
+ = & Assignment & Right to Left \\ \hline
+ not & Boolean Negation & Right to Left \\ \hline
+ ==, $>, <, >=, <=$ & Comparisons & Left to Right \\ \hline
+ or & Or & Left to Right \\ \hline
+and & And & Left to Right \\ \hline
+ $\^{}$ & Power & Left to Right \\ \hline
+ $\|$ & Absolute Value & Non-associative \\ \hline
+ to\_str & Convert poly to string & Left to Right \\ \hline
+ +, - & Addition, Subtraction & Left to Right \\ \hline
+ *, / & Multiplication, Division & Left to Right \\ \hline
+ - & Unary Subtraction & Non-associative \\ \hline
+ \# & Constants Retriever & Left to Right \\ \hline
+ @ & Evaluation & Left to Right \\ \hline
+ : & Composition & Left to Right \\ 
+ \hline
+ \end{tabular}}
+\end{center}
+\subsection{Functions}
+In the language a function is a statement that will take a list of arguments and return a single value or nothing. The list of arguments that it takes in will require type specification. The function definition will start with the keyword def and then the return type. If it returns nothing, keyword \textbf{void} is used instead. Its identifier will follow the return type. \\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad fdecl$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad DEF typ ID LPAREN formals\_opt RPAREN LBRACE vdecl\_list stmt\_list RBRACE}\\
+\\ 
+\begin{lstlisting}
+    /*function definition example */
+    def string tex_string(float a, int b) {  /* { begins body */
+        poly poly1 = new_poly([a, 2.0, 3.0], [2, b, 0]);
+        string nice_n_tex = poly1.print_tex();
+        return nice_n_tex; /*return statement with nice_n_tex type string
+    } /* closes body */
+    
+    /*returns nothing */
+    def void add_poly(float a, int b) {  
+        poly poly1 = new_poly([a, 2.0, 3.0], [2, b, 0]);
+        poly poly2 = new_poly([a, 2.0, 3.0], [2, b, 0]);
+        poly poly3 = poly1 + poly2;
+    } 
+\end{lstlisting}
+\subsection{Function Calls}
+
+To call a function, the identifier along with its arguments in parentheses will be used. If a function is called using improper types or without sufficient arguments, an error will be raised during compilation, depending on why the arguments failed. In the grammar, a function call is an expression (expr), so it can be assigned to a variable or stand on its own.  \\
+\begin{lstlisting}
+    /*function call examples  */
+    tex_string(2.0, 2.0); /*outputs a string */
+    tex_string(5.0, 2.0); /*outputs a string */
+    tex_string(5.0); /*would raise an error at compile time */
+    tex_string(5, 2); /*would raise a TypeError at runtime */
+\end{lstlisting}
+
+\subsubsection{Variable Assignment from Functions}
+
+Variables can be assigned to the return value of a function assuming the return type of the function and the type of the variable are the same. If they are not, this will raise a TypeError at runtime. In the grammar, this is done as an expression (expr) and is given as expression \lstinline{EQ} expression.
+
+\begin{lstlisting}
+    /*variable assignment examples */
+    string poly_tex_one = tex_string(2.0, 2.0); /*outputs a string */
+    int poly_tex_one = tex_string(2.0, 2.0); /*would raise a TypeError at runtime */
+\end{lstlisting}
+
+\section{Standard Library}
+\section{Standard Library}
+\subsection{Sequence operations}
+PolyWiz supports the following operations with both arrays and strings:
+\begin{center}
+\resizebox{.8\textwidth}{!}{
+  \begin{tabular}{ | l | c | r | }
+    \hline
+    \textbf{Method/operation} & \textbf{Result} \\ \hline
+    str[\textit{i}] & Returns the \textit{i}'th item in str \\
+     & Raises an IndexError if \textit{i} is outside the range of str \\ \hline
+    str[\textit{i}:\textit{j}] & Returns the substring/array between the \textit{i}'th item and the \textit{j}'th item in str \\
+    & If \textit{i} is not defined, the substring/array from index 0 up to \textit{j} is returned, and vice versa if \textit{j} is not defined \\
+     & Raises an IndexError if \textit{i} or \textit{j} is outside the range of str \\ \hline
+    str1 + str2 & Returns a concatenation of both str1 and str2 in the form of a single string or array \\ \hline
+    length(str) &  Returns the size/length of str in terms of its number of characters or items \\ \hline
+    \end{tabular}}
+\end{center}
+    \textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad array\_operation \{ \$1 \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad array\_operation$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad expr LBRACK  expr RBRACK \{ IndexArray(\$1, \$3) \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad  $\vert$\;  expr LBRACK  expr COLON expr RBRACK \{ SliceArray(\$1, \$3, \$5) \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad $\vert$\; LENGTH LPAREN expr RPAREN \{ Length(\$3) \}}\\
+\subsection{Printing}
+PolyWiz supports using print() to display a string representation of any built-in type in standard output. print() cannot take in a concatenation of two different types, it will raise a TypeError. \\ \\
+\textbf{Method:}\text{ print()} \\
+\textbf{Return Type:}\text{ string }\\
+\textbf{Parameter:}\text{ Any expression or variable of a built-in type}\\
+\textbf{Function Logic:}\text{ Outputs a string to stdout representing function input.}\\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad PRINT LPAREN expr RPAREN \{ Print\_stuff(\$3) \}}\\
+\begin{lstlisting}
+    /*print example */
+    string a = "Hello";
+    print(a); /* Standard output will display: Hello */
+    print(7); /* Standard output will display: 7 */
+    print(a + 7); /* This will raise a TypeError, cannot concatenate a string and an int */
+\end{lstlisting}
+\subsection{Plotting}
+PolyWiz will support basic plotting of 2D polynomial functions, allowing for customization of both x and y range. If no ranges are given, a default range will be chosen. Plot will produce a basic plot which will be output to the filepath passed as an argument. \\ \\
+\textbf{Method:}\text{ plot()} \\
+\textbf{Return Type:}\text{ string }\\
+\textbf{Parameters:}\text{ filepath, a list of polynomials, x min, x max, y min, y max}\\
+\textbf{Function Logic:}\text{ Returns a string that is the filepath where the plot was produced.}\\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad PLOT LPAREN expr COMMA POLY\_ARR\_LIT COMMA expr COMMA expr COMMA expr}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad COMMA expr RPAREN \{ Plot\_stuff(\$1, \$3, \$5, \$7, \$9, \$11, \$13) \}}\\
+\begin{lstlisting}
+    /*graph example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly1 = x^2 + 2x + 3 */
+    /*plot(<FILEPATH>, [list of polynomials], x min, x max, y min, y max) */
+    plot(<FILEPATH>, [poly1], -10, 10, 0, 20);
+    
+\end{lstlisting}
+\subsection{\TeX\text{ }Integration}
+\LaTeX \text{ }is the true mathematician's language, and as such, PolyWiz is designed to support seamless\text{ }\TeX\text{ }integration. Every poly can be formatted in\text{ }\TeX\text{ }, and entire documents including plots can be generated easily.
+\subsubsection{\TeX\text{ }Formatting}
+\textbf{Method:}\text{ print\_poly()} \\
+\textbf{Return Type:}\text{ string }\\
+    \textbf{Operand:}\text{ Poly variable on left side of the method (print\_tex)}\\
+    \textbf{Function Logic:}\text{ Returns a string representation of the typeset polynomial.}\\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad PRINT\_TEX LPAREN expr RPAREN \{ Print\_latex(\$3) \}}\\
+    \begin{lstlisting}
+    /* print_poly() example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly1 = x^2 + 2x + 3 */
+    string poly1_str = poly1.print_tex(); /* poly1_str = "$$x^{2}+2x+3$$" */
+    \end{lstlisting}
+\subsubsection{Generating \TeX\text{ }Documents}
+\textbf{Function:}\text{ tex\_document()} \\
+\textbf{Return Type:}\text{ string }\\
+    \textbf{Parameters:}\text{ array $a$ of strings containing text, typeset equations, and file paths to saved plots, array $b$ of indices of plots}\\
+    \textbf{Function Logic:}\text{ Returns\text{ }\TeX\text{ }document containing equations and plots in the format of a string}\\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad expr$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad TEX\_DOC LPAREN STRING\_ARR\_LIT COMMA INT\_ARR\_LIT RPAREN}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\{ Generate\_doc(\$3, \$5) \}}\\
+    \begin{lstlisting}
+    /* tex_document() example */
+    poly poly1 = new_poly([1.0, 2.0, 3.0], [2, 1, 0]); /* poly1 = x^2 + 2x + 3 */
+    string intro = "After much research, we present the Edwards polynomial:";
+    string outro = "This will revolutionize the field of compilers.";
+    string poly1_str = poly1.print_tex() ; /* poly1_str = "$$x^{2}+2x+3$$" */
+    string poly1_plt = plot("mypc/coms4115/edwards.png", [poly1], -10, 10, 0, 20);
+    string doc1 = tex_document([intro, poly1_plt, poyl1_str, outro], [1]); /* generate document */
+    print(doc1); /* print document (to std out) */
+    \end{lstlisting}
+    This prints the following text:
+    \begin{verbatim}
+        \documentclass{article}
+        \begin{document}
+        \usepackage{graphicx}
+        After much research, we present the Edwards polynomial:
+        \begin{figure}[!h]
+        \centering
+        \includegraphics[width=3.5in]{mypc/coms4115/edwards.png}
+        \label{fig_sim}
+        \end{figure}
+        $$x^{2}+2x+3$$
+        This will revolutionize the field of compilers.
+        \end{document}
+    \end{verbatim}
+
+	\subsection{Exception Handling}
+PolyWiz will support basic handling of errors at runtime by allowing you to wrap a try-catch-finally mechanism around a block of code. This functionality can be very useful when a small chunk of code or statement in a program inputs arguments of a wrong type into a function for example, and even if that statement does not run properly, it does not hinder the flow of the rest of the program. \\\\
+\textbf{Grammar:}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad stmt$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad TRY LBRACE stmt\_list RBRACE catch NOFINALLY \{ TryCatch(List.rev \$3, \$5, []) \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad $\vert$\; TRY LBRACE stmt\_list RBRACE catch FINALLY LBRACE stmt\_list RBRACE}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\{ TryCatch(List.rev \$3, \$5, List.rev \$8) \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad catch$\colon$}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad CATCH LPAREN expr RPAREN LBRACE stmt\_list RBRACE \{ [Catch(\$3, List.rev \$6)] \}}\\
+    \text{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad $\vert$\; CATCH LPAREN expr RPAREN LBRACE stmt\_list RBRACE catch \{ Catch(\$3, List.rev \$6) :: \$8 \}}\\
+\begin{lstlisting}
+// example of exception handling
+void print_twelfth([int] arr) {
+// Attempting to index and print out the 12th item in the array would raise an IndexError, thus we allow the program to "catch" this error and continue on
+    try {
+        print("Twelfth item: " + to_str(arr[11]));
+    }
+    catch(IndexError) {
+    /* This will display in standard output */
+        print("Array contains less than 12 items.");
+    }
+    finally {
+    /* This will also display in standard output regardless of the try-catch evaluation */
+        print("Finally we can go to Catch!");    
+    }
+}
+
+[int] arr = [1, 4, 6, 3, 0];
+print_twelfth(arr);
+print("Let's hit Catch!")
+\end{lstlisting}
+
+
+\section{Sample Code}
+Here is a simple function that composes two polynomials, plots the original and composed polynomials, and then returns the composition formatted in \LaTeX:
+
+\begin{lstlisting}
+def string compose_n_graph(float a, int b) {
+    poly poly1 = new_poly([a, 2.0, 3.0], [2, 1, 0]); /* poly1 = ax^2 + 2x + 3 */
+    poly poly2 = new_poly([2.0, 4.0, 6.0], [b, 2, 3]); /* poly2 = 2x^b + 4x^2 + 6x^3 */
+    poly poly3 = poly2 : poly1; /*composes the two polynomials */
+    for (int i = 1; i < 50; i = i + 1) {
+        float tmpy1 = poly1 @ i;
+        float tmpy2 = poly2 @ i;
+        float tmpy3 = poly3 @ i;
+        print(i, tmpy1, tmpy2, tmpy3);
+    }
+    plot("zaphod2/~/edwards/desktop/pretty_polynomial.png", [poly1, poly2, poly3], -20, 20, -20, 20);
+    
+    string nice_n_tex = poly3.print_tex();
+    return nice_n_tex;
+}
+compose_n_graph(2.0,2.0);
+
+\end{lstlisting}
+
+\end{document}

@@ -1,0 +1,1 @@
+set term pngcairo; set output 'test.png'; plot 'circle.txt' w l

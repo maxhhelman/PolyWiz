@@ -145,6 +145,9 @@ let translate (globals, functions) =
   let printstr_func : L.llvalue =
       L.declare_function "printstr" printstr_t the_module in
   *)
+  
+  let arr_contains_t = L.function_type i32_t [| L.pointer_type i32_t; i32_t |] in
+  let arr_contains_func  = L.declare_function "arr_contains" arr_contains_t the_module in
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -213,7 +216,7 @@ let translate (globals, functions) =
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
-      | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (poly), e2 (float) *)
         let e1' = expr builder e1
         and e2' = expr builder e2 in
         (match op with
@@ -224,7 +227,7 @@ let translate (globals, functions) =
           | _ -> raise (Failure "This operation is invalid for a poly and float operand.")
         )
 
-      | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (poly), e2 (poly) *)
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
 	  (match op with
@@ -310,7 +313,7 @@ let translate (globals, functions) =
 	      raise (Failure "internal error: semant should have rejected and/or on float")
     | _ -> raise (Failure "This operation is invalid for these operands."))
 
-      | SBinop (e1, op, e2) -> (* Binary op where e1, e1 are both ints*)
+      | SBinop (e1, op, e2) -> (* Binary op where e1, e2 are both ints*)
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
 	  (match op with
@@ -331,6 +334,10 @@ let translate (globals, functions) =
 	  | A.Geq     -> L.build_icmp L.Icmp.Sge e1' e2' "tmp" builder
     | _ -> raise (Failure "This operation is invalid for these operands.")
 	  )
+      | SBinop (((t,_ ) as e1), op, ((A.Array(_),_ ) as e2)) when op = A.In -> (* Binary op where e2 is an array *)
+    let e1' = expr builder e1
+    and e2' = expr builder e2 in
+                   L.build_call arr_contains_func [| e1'; e2' |] "arr_contains_llvm" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
 	  (match op with

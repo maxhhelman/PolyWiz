@@ -5,7 +5,7 @@ open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
-%token NOT EQ NEQ LT LEQ GT GEQ AND OR
+%token NOT EQ NEQ LT LEQ GT GEQ AND OR IN
 %token LBRACK RBRACK 
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID DEF STRING POLY
 %token EXP ABS COMPO EVAL CONST_RET
@@ -25,6 +25,7 @@ open Ast
 %left ABS
 %left EQ NEQ
 %left LT GT LEQ GEQ
+%left IN
 %left PLUS MINUS
 %left TIMES DIVIDE
 %left EXP
@@ -108,9 +109,9 @@ elements_list:
 | elements_list COMMA expr {$3 :: $1 }
 
 expr:
-   LBRACK element RBRACK { ArrayLit($2) }
-  |  LITERAL          { Literal($1)            }
-  | FLIT	     { Fliteral($1)           }
+   LBRACK element RBRACK { ArrayLit($2)       }
+  |  LITERAL         { Literal($1)            }
+  | FLIT	           { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
   | SLIT             { Sliteral($1)           }
   | ID               { Id($1)                 }
@@ -118,19 +119,20 @@ expr:
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
-  | expr EXP expr { Binop($1, Exp,   $3)   }
-  | expr COMPO expr { Binop($1, Compo,   $3)   }
-  | expr CONST_RET { Unop(Const_ret,   $1)   }
-  | expr EVAL expr { Binop($1, Eval,   $3)   }
+  | expr EXP    expr { Binop($1, Exp,   $3)   }
+  | expr COMPO expr  { Binop($1, Compo,   $3) }
+  | expr CONST_RET   { Unop(Const_ret,   $1)  }
+  | expr EVAL   expr { Binop($1, Eval,   $3)  }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
   | expr LEQ    expr { Binop($1, Leq,   $3)   }
   | expr GT     expr { Binop($1, Greater, $3) }
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
+  | expr IN     expr { Binop($1, In,   $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
-  | ABS expr ABS { Unop(Abs, $2)   }
+  | ABS expr ABS     { Unop(Abs, $2)          }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }

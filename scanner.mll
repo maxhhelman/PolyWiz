@@ -30,6 +30,7 @@ rule token = parse
 | "!="     { NEQ }
 | '<'      { LT }
 | "<="     { LEQ }
+| "in"     { IN }
 | ">"      { GT }
 | ">="     { GEQ }
 | "and"     { AND }

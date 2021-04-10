@@ -9,6 +9,7 @@
 #include <string.h>
 #include <float.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 /*
  * Font information: one byte per row, 8 rows per character
@@ -110,9 +111,9 @@ int order(double *poly){
 
 double* new_poly(double *consts, int consts_length, int *exponents, int exponents_length){
   //if unequal size of consts and exponents arrays
-  if ( consts_length != exponents_length ) 
+  if ( consts_length != exponents_length )
     return NULL;
-  
+
   //find the order of the polynomial
   int order = -1;
   for(int i=0; i < exponents_length; i++){
@@ -122,7 +123,7 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
 
   //initialize the poly array with zeros
   double *poly_arr = malloc( (order+2) * sizeof (double));
- 
+
   for(int i=0; i <= order; i++)
       poly_arr[i] = 0.0;
   //terminate the poly arr with DBL_MIN
@@ -134,7 +135,7 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
     double constant = consts[i];
     poly_arr[exponent] = constant;
   }
-
+  system("echo hello");
   return poly_arr;
 
 }
@@ -186,7 +187,7 @@ double* poly_multiplication(double *poly1, double *poly2){
   // poly_product array will be the size of the sum of the largest exponent on poly1 and poly2
   int poly_product_order = poly1_order+poly2_order;
   double *poly_product = malloc((poly_product_order +2) * (sizeof (double)));
-  
+
   // Initialize the product polynomial with 0s as constants
   for (int i = 0; i<=poly_product_order; i++)
     poly_product[i] = 0;
@@ -208,7 +209,7 @@ double* poly_multiplication(double *poly1, double *poly2){
 double* constants_retriever(double *poly){
   int poly_order = order(poly);
   double *poly_consts = malloc((poly_order+1) * sizeof (double));
-  
+
   // fill in the poly consts array
   for (int i = 0; i<=poly_order; i++)
     poly_consts[i] = poly[i];
@@ -219,7 +220,7 @@ double* constants_retriever(double *poly){
 
 double eval_poly(double *poly, double x){
   int poly_order = order(poly);
-  
+
   // evaluate poly at specified value x
   double poly_at_x = 0.0;
   for (int i = 0; i<=poly_order; i++)
@@ -231,7 +232,7 @@ double eval_poly(double *poly, double x){
 bool equal_compare_poly(double *poly1, double *poly2){
   int poly1_order = order(poly1);
   int poly2_order = order(poly2);
-  
+
   //if not the same order, not equal
   if(poly1_order != poly2_order)
     return false;
@@ -250,7 +251,7 @@ bool equal_compare_poly(double *poly1, double *poly2){
 bool nequal_compare_poly(double *poly1, double *poly2){
   int poly1_order = order(poly1);
   int poly2_order = order(poly2);
-  
+
   //if not the same order, not equal
   if(poly1_order != poly2_order)
     return false;
@@ -274,7 +275,7 @@ double* poly_division(double *poly1, double denominator){
   double *poly_divisor = malloc((2) * sizeof (double));
   poly_divisor[0] = 1.0 / denominator;
   poly_divisor[1] = DBL_MIN;
-  
+
   return poly_multiplication(poly1, poly_divisor);
 
 }
@@ -291,7 +292,7 @@ double* poly_composition(double *poly1, double *poly2){
   for (int i = 0; i<=composed_poly_order; i++)
     composed_poly[i] = 0;
   composed_poly[composed_poly_order+1] = DBL_MIN;
-  
+
   // Loop through each term of first polynomial
   for (int i=0; i<=poly1_order; i++)
   {
@@ -332,7 +333,7 @@ double* poly_composition(double *poly1, double *poly2){
 char* poly_to_str(double *poly){
   int poly_order = order(poly);
   const int max_digits = 350;
-  
+
   //empty poly
   if(poly_order<0){
     char *poly_str = malloc( sizeof (char));
@@ -370,7 +371,7 @@ char* poly_to_str(double *poly){
 char* poly_to_tex(double *poly){
   int poly_order = order(poly);
   const int max_digits = 350;
-  
+
   //empty poly
   if(poly_order<0){
     char *poly_str = malloc( sizeof (char));
@@ -409,10 +410,24 @@ char* poly_to_tex(double *poly){
 }
 
 //get poly const at ind
-double poly_at_ind(double *poly, int ind){  
+double poly_at_ind(double *poly, int ind){
   return poly[ind];
 }
 
+int plot(double *poly) {
+  FILE *fp = fopen("plotting/polypoints.txt","w");
+  double num_points = 100.0;
+  double range_bottom = -20.0;
+  double range_top = 20.0;
+  for (double x_val = range_bottom; x_val < range_top; x_val += 0.2 ) {
+    int poly_order = order(poly);
+    double y_val = eval_poly(poly, x_val);
+    fprintf(fp, "%lf\t %lf\n", x_val, y_val);
+  }
+  fclose(fp);
+  printf("%d\n", system("gnuplot plotting/gnuplotscript"));
+  return 0;
+}
 
 #ifdef BUILD_TEST
 int main()
@@ -420,6 +435,8 @@ int main()
   double a = pow(1.0, 2.0);
   char s[] = "HELLO WORLD09AZ";
   char *c;
+  double curve[] = {4.0, 5.0, 7.0, 8.0, DBL_MIN};
+  plot(curve);
   for ( c = s ; *c ; c++) printbig(*c);
 }
 #endif

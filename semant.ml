@@ -39,6 +39,7 @@ let check (globals, functions) =
             else if name="to_str" then String
             else if name="order" then Int
             else if name="plot" then Int
+            else if name="range_plot" then Int
             else Void;
       fname = name;
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
@@ -46,6 +47,7 @@ let check (globals, functions) =
                 else if name="to_str" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
                 else if name="plot" then [(Poly, "x")]
+                else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -57,6 +59,7 @@ let check (globals, functions) =
              ("to_str", Bool);
              ("order", Bool);
              ("plot", Bool);
+             ("range_plot", Bool);
              ("poly_at_ind", Bool) ]
   in
 

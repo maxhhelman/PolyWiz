@@ -1,0 +1,1 @@
+set term pngcairo; set output 'plotting/standard_plot.png'; plot 'plotting/polypoints.txt' w l

@@ -59,7 +59,7 @@ let check (globals, functions) =
 						 ("printstr", String);
              ("new_poly", Bool);
              ("to_str", Bool);
-             ("print_tex", Bool);
+             ("print_tex", String);
              ("order", Bool);
              ("plot", Bool);
              ("range_plot", Bool);

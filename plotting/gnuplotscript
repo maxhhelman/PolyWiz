@@ -1,1 +1,1 @@
-set term pngcairo; set output 'test.png'; plot 'circle.txt' w l
+set term pngcairo; set output 'plot.png'; plot 'polypoints.txt' w l

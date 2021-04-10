@@ -408,6 +408,57 @@ char* poly_to_tex(double *poly){
 
 }
 
+char* generate_texdoc(char **texdocbody, int *imgindices){
+  //header and footer of the body
+  char header[] = "\\documentclass{article}\n\\usepackage{graphicx}\n\\begin{document}";
+  char footer[] = "\n\\end{document}";
+
+  //header and footer to wrap filepath of image
+  char imgheader[] = "\\begin{figure}[h]\n\\centering\n\\includegraphics[width=4in]{";
+  char imgfooter[] = "}\n\\label{fig_sim}\n\\end{figure}";
+
+  //find length of everything
+  int len = strlen(header) + strlen(footer) + ((sizeof(imgindices)/sizeof(int)) * (strlen(imgheader) + strlen(imgfooter))) + sizeof(texdocbody);
+  int num_elems = sizeof(texdocbody)/sizeof(*texdocbody);
+  for(int i = 0; i < num_elems; i++) {
+    len = len + strlen(texdocbody[i]) + 2;
+  }
+
+  //now, actually make the string
+  char *texdoc_str = malloc(len+100);
+  char *texdoc_str_ind = texdoc_str;
+
+  //print header
+  texdoc_str_ind += sprintf(texdoc_str_ind, "%s", header);
+
+  for(int i = 0; i < num_elems+2; i++){
+    
+    //check if it is an image
+    int isimg = 0;
+    for(int j = 0; j < (sizeof(imgindices)/sizeof(int)); j++){
+        if(imgindices[j] == i){
+            isimg = 1;
+        }
+    }
+    //handle image case
+    if(isimg){
+        texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s", imgheader);
+        texdoc_str_ind += sprintf(texdoc_str_ind, "%s", texdocbody[i]);
+        texdoc_str_ind += sprintf(texdoc_str_ind, "%s", imgfooter);
+    }
+    //handle non-image case
+    else{
+        texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s", texdocbody[i]);
+    }
+
+  }
+
+  //print footer
+  texdoc_str_ind += sprintf(texdoc_str_ind, "%s", footer);
+
+  return texdoc_str;
+}
+
 //get poly const at ind
 double poly_at_ind(double *poly, int ind){
   return poly[ind];

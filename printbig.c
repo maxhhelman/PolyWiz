@@ -135,7 +135,6 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
     double constant = consts[i];
     poly_arr[exponent] = constant;
   }
-  system("echo hello");
   return poly_arr;
 
 }
@@ -416,17 +415,32 @@ double poly_at_ind(double *poly, int ind){
 
 int plot(double *poly) {
   FILE *fp = fopen("plotting/polypoints.txt","w");
-  double num_points = 100.0;
   double range_bottom = -20.0;
   double range_top = 20.0;
-  for (double x_val = range_bottom; x_val < range_top; x_val += 0.2 ) {
+  for (double x_val = range_bottom; x_val < range_top; x_val += 0.2) {
     int poly_order = order(poly);
     double y_val = eval_poly(poly, x_val);
     fprintf(fp, "%lf\t %lf\n", x_val, y_val);
   }
   fclose(fp);
-  printf("%d\n", system("gnuplot plotting/gnuplotscript"));
-  return 0;
+  int return_code = system("gnuplot plotting/gnu_plotscript");
+  system("rm plotting/polypoints.txt");
+  return return_code;
+}
+
+int range_plot(double *poly, double range_bottom, double range_top) {
+  FILE *fp = fopen("plotting/polypoints.txt","w");
+  double num_points = 100.0;
+  double counter = (range_top - range_bottom) / num_points;
+  for (double x_val = range_bottom; x_val < range_top; x_val += counter ) {
+    int poly_order = order(poly);
+    double y_val = eval_poly(poly, x_val);
+    fprintf(fp, "%lf\t %lf\n", x_val, y_val);
+  }
+  fclose(fp);
+  int return_code = system("gnuplot plotting/gnu_rangeplotscript");
+  system("rm plotting/polypoints.txt");
+  return return_code;
 }
 
 #ifdef BUILD_TEST

@@ -38,12 +38,14 @@ let check (globals, functions) =
             else if name="poly_at_ind" then Float
             else if name="to_str" then String
             else if name="order" then Int
+            else if name="plot" then Int
             else Void;
-      fname = name;      
-      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")] 
-                else if name="poly_at_ind" then [(Poly, "x");(Int, "y")] 
-                else if name="to_str" then [(Poly, "x")] 
-                else if name="order" then [(Poly, "x")] 
+      fname = name;
+      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
+                else if name="poly_at_ind" then [(Poly, "x");(Int, "y")]
+                else if name="to_str" then [(Poly, "x")]
+                else if name="order" then [(Poly, "x")]
+                else if name="plot" then [(Poly, "x")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -51,10 +53,11 @@ let check (globals, functions) =
 			                         ("printf", Float);
 			                         ("printbig", Int);
 						 ("printstr", String);
-             ("new_poly", Bool); 
-             ("to_str", Bool); 
-             ("order", Bool); 
-             ("poly_at_ind", Bool) ] 
+             ("new_poly", Bool);
+             ("to_str", Bool);
+             ("order", Bool);
+             ("plot", Bool);
+             ("poly_at_ind", Bool) ]
   in
 
   (* Add function name to symbol table *)
@@ -109,15 +112,15 @@ let check (globals, functions) =
       | Fliteral l -> (Float, SFliteral l)
       | BoolLit l  -> (Bool, SBoolLit l)
       | Sliteral l -> (String, SSliteral l)
-      | ArrayLit l ->        
-      if List.length l > 0 then 
+      | ArrayLit l ->
+      if List.length l > 0 then
           let l' = List.map expr l in
           let array_type = (List.nth l' 0) in
           match array_type with
-            (Int,_) -> (Array(Int), SArrayLit l') 
+            (Int,_) -> (Array(Int), SArrayLit l')
           | (Float,_) -> (Array(Float), SArrayLit l')
-          | (Bool,_) -> (Array(Bool), SArrayLit  l') 
-          | (String,_) -> (Array(String), SArrayLit l') 
+          | (Bool,_) -> (Array(Bool), SArrayLit  l')
+          | (String,_) -> (Array(String), SArrayLit l')
           |  _ ->  raise (Failure ("not a valid array type"))
       else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)

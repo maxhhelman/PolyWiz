@@ -37,11 +37,11 @@ let translate (globals, functions) =
   let string_t = L.pointer_type i8_t in
 
   (* Poly type *)
-  let poly_t = L.pointer_type float_t in  
+  let poly_t = L.pointer_type float_t in
 
   (* array types *)
-  let float_arr_t = L.pointer_type float_t in  
-  let int_arr_t = L.pointer_type i32_t in  
+  let float_arr_t = L.pointer_type float_t in
+  let int_arr_t = L.pointer_type i32_t in
 
 
 (* Return the LLVM type for a PolyWiz type *)
@@ -61,7 +61,7 @@ let translate (globals, functions) =
   let ci = L.const_int i32_t
     in
   let new_arr t len builder =
-    let s_tot = L.build_add (L.build_mul (L.build_intcast 
+    let s_tot = L.build_add (L.build_mul (L.build_intcast
      (L.size_of (ltype_of_typ t)) i32_t "tmp" builder)
      len "tmp" builder) (ci 1) "tmp" builder
      in
@@ -93,7 +93,7 @@ let translate (globals, functions) =
         rec_count 0
     in
 
-    arr 
+    arr
   in
 
 (*  let index_array arr ind assign builder =
@@ -106,15 +106,15 @@ let translate (globals, functions) =
 
 
   let list_length e =
-    (match e with 
+    (match e with
       (_, SArrayLit(l)) -> List.length l
       | _ -> 0
     ) in
   let list_ele e ind =
-    (match e with 
-      (A.Array(t), SArrayLit(l)) -> 
+    (match e with
+      (A.Array(t), SArrayLit(l)) ->
         let l0=List.nth l ind in
-        (match l0 with 
+        (match l0 with
           (A.Int, SLiteral(inte)) -> inte
           | _ -> 0
         )
@@ -199,10 +199,10 @@ let translate (globals, functions) =
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SSliteral l -> L.build_global_stringptr ( String.sub l 1 ((String.length l) - 2)) "str" builder
       | SFliteral l -> L.const_float_of_string float_t l
-      | SArrayLit l -> 
+      | SArrayLit l ->
         let l' = (List.map (expr builder) l) in
-        let arr_element_type = function 
-            A.Array(A.Int) -> A.Int 
+        let arr_element_type = function
+            A.Array(A.Int) -> A.Int
           | A.Array(A.Float) -> A.Float
           | A.Array(A.Bool) -> A.Bool
           | A.Array(A.String) -> A.String
@@ -345,7 +345,7 @@ let translate (globals, functions) =
       L.build_call abs_external_func_floats [| e' |] "abs_operator_float_llvm" builder
     | A.Abs                  ->
       let abs_external_func_ints = L.declare_function "abs_operator_int" (L.function_type i32_t [|i32_t|]) the_module in
-      L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder 
+      L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder
     | _ -> raise (Failure "This operation is invalid for these operands.")
     )
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
@@ -375,6 +375,9 @@ let translate (globals, functions) =
       | SCall ("to_str", [e]) ->
         let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder
+      | SCall ("plot", [e]) ->
+        let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_t|]) the_module in
+        L.build_call plot_external_func [| expr builder e |] "plot_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -449,4 +452,3 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
-

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <float.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 /*
  * Font information: one byte per row, 8 rows per character
@@ -134,7 +135,7 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
     double constant = consts[i];
     poly_arr[exponent] = constant;
   }
-
+  system("echo hello");
   return poly_arr;
 
 }
@@ -413,19 +414,19 @@ double poly_at_ind(double *poly, int ind){
   return poly[ind];
 }
 
-void plot_poly(double *poly) {
-  FILE *fp = fopen("polypoints.txt","w");
+int plot(double *poly) {
+  FILE *fp = fopen("plotting/polypoints.txt","w");
   double num_points = 100.0;
-  double range_bottom = -10.0;
-  double range_top = 10.0;
+  double range_bottom = -20.0;
+  double range_top = 20.0;
   for (double x_val = range_bottom; x_val < range_top; x_val += 0.2 ) {
     int poly_order = order(poly);
     double y_val = eval_poly(poly, x_val);
     fprintf(fp, "%lf\t %lf\n", x_val, y_val);
   }
   fclose(fp);
-  system("gnuplot 'plotting/gnuplotscript' ");
-  system("rm polypoints.txt");
+  printf("%d\n", system("gnuplot plotting/gnuplotscript"));
+  return 0;
 }
 
 #ifdef BUILD_TEST
@@ -434,6 +435,8 @@ int main()
   double a = pow(1.0, 2.0);
   char s[] = "HELLO WORLD09AZ";
   char *c;
+  double curve[] = {4.0, 5.0, 7.0, 8.0, DBL_MIN};
+  plot(curve);
   for ( c = s ; *c ; c++) printbig(*c);
 }
 #endif

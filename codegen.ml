@@ -376,9 +376,9 @@ let translate (globals, functions) =
       | SCall ("to_str", [e]) ->
         let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder
-      | SCall ("tex_document", [e]) ->
+      | SCall ("tex_document", [e1;e2]) ->
         let print_texdoc_external_func = L.declare_function "tex_document" (L.function_type string_t [|string_arr_t; int_arr_t|]) the_module in
-        L.build_call print_texdoc_external_func [| expr builder e |] "print_texdoc_llvm" builder
+        L.build_call print_texdoc_external_func [| expr builder e1; expr builder e2 |] "print_texdoc_llvm" builder
       | SCall ("plot", [e]) ->
         let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_t|]) the_module in
         L.build_call plot_external_func [| expr builder e |] "plot_llvm" builder

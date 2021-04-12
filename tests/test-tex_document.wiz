@@ -1,0 +1,22 @@
+def int main()
+{
+  string[] body;
+  string tex_doc;
+  int[] ind;
+  string intro;
+  string outro;
+  string fp;
+  ind = [1];
+  intro = "Edwards is a good prof";
+  outro = "Hans is a chill TA";
+  fp = "shrihan.png";
+
+  body = [intro, fp, outro];
+
+  tex_doc = tex_document(body, ind);
+
+  printstr(tex_doc);
+
+
+  return 0;
+}

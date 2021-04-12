@@ -42,6 +42,7 @@ let translate (globals, functions) =
   (* array types *)
   let float_arr_t = L.pointer_type float_t in
   let int_arr_t = L.pointer_type i32_t in
+  let string_arr_t = L.pointer_type string_t in
 
 
 (* Return the LLVM type for a PolyWiz type *)
@@ -375,6 +376,9 @@ let translate (globals, functions) =
       | SCall ("to_str", [e]) ->
         let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder
+      | SCall ("tex_document", [e1;e2]) ->
+        let print_texdoc_external_func = L.declare_function "generate_texdoc" (L.function_type string_t [|string_arr_t; int_arr_t|]) the_module in
+        L.build_call print_texdoc_external_func [| expr builder e1; expr builder e2 |] "print_texdoc_llvm" builder
         | SCall ("print_tex", [e]) ->
         let poly_to_tex_external_func = L.declare_function "poly_to_tex" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_tex_external_func [| expr builder e |] "poly_to_tex_llvm" builder

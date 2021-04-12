@@ -37,6 +37,7 @@ let check (globals, functions) =
       typ = if name="new_poly" then Poly
             else if name="poly_at_ind" then Float
             else if name="to_str" then String
+            else if name="tex_document" then String
             else if name="print_tex" then String
             else if name="order" then Int
             else if name="plot" then Int
@@ -46,6 +47,7 @@ let check (globals, functions) =
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
                 else if name="poly_at_ind" then [(Poly, "x");(Int, "y")]
                 else if name="to_str" then [(Poly, "x")]
+                else if name="tex_document" then [(Array(String), "x"); (Array(Int), "y")]
                 else if name="print_tex" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
                 else if name="plot" then [(Poly, "x")]
@@ -59,6 +61,7 @@ let check (globals, functions) =
 						 ("printstr", String);
              ("new_poly", Bool);
              ("to_str", Bool);
+             ("tex_document", String);
              ("print_tex", String);
              ("order", Bool);
              ("plot", Bool);

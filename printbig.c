@@ -409,6 +409,7 @@ char* poly_to_tex(double *poly){
 }
 
 char* generate_texdoc(char **texdocbody, int *imgindices){
+
   //header and footer of the body
   char header[] = "\\documentclass{article}\n\\usepackage{graphicx}\n\\begin{document}";
   char footer[] = "\n\\end{document}";
@@ -425,28 +426,29 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   }
 
   //now, actually make the string
-  char *texdoc_str = malloc(len+100);
+  char *texdoc_str = malloc(len * 2);
   char *texdoc_str_ind = texdoc_str;
 
   //print header
   texdoc_str_ind += sprintf(texdoc_str_ind, "%s", header);
 
   for(int i = 0; i < num_elems+2; i++){
-    
-    //check if it is an image
     int isimg = 0;
+
+    //check if it is an image
     for(int j = 0; j < (sizeof(imgindices)/sizeof(int)); j++){
-        if(imgindices[j] == i){
+        if((imgindices[j] == i && imgindices[j] != 0) || i == 0 && imgindices[0] == 0){
             isimg = 1;
+            break;
         }
     }
     //handle non-image case
-    if(isimg == 1){
+    if(isimg == 0){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s", texdocbody[i]);
     }
 
     //handle image case
-    else if(isimg == 0){
+    else if(isimg == 1){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s%s%s", imgheader, texdocbody[i], imgfooter);
     }
 

@@ -1,0 +1,11 @@
+\documentclass{article}
+\usepackage{graphicx}
+\begin{document}
+Edwards is a good prof
+\begin{figure}[h]
+\centering
+\includegraphics[width=4in]{shrihan.png}
+\label{fig_sim}
+\end{figure}
+Hans is a chill TA
+\end{document}

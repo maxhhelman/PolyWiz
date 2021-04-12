@@ -426,7 +426,7 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   }
 
   //now, actually make the string
-  char *texdoc_str = malloc(len * 2);
+  char *texdoc_str = malloc(len + 100);
   char *texdoc_str_ind = texdoc_str;
 
   //print header

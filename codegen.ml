@@ -97,14 +97,11 @@ let translate (globals, functions) =
     arr
   in
 
-(*  let index_array arr ind assign builder =
-    let arr = L.build_load arr "tmp" builder in
-    let _val = L.build_gep arr [| (L.build_add ind (ci 1) "tmp" builder) |]
+ let index_array arr ind assign builder =
+    let _val = L.build_gep (L.build_load arr "tmp" builder) [| (L.build_add ind (ci 1) "tmp" builder) |]
      "tmp" builder in
     if assign then _val else L.build_load _val "tmp" builder
   in
-  *)
-
 
   let list_length e =
     (match e with

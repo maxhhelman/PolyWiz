@@ -103,7 +103,6 @@ let translate (globals, functions) =
     if assign then _val else L.build_load _val "tmp" builder
   in
 
-
   let list_length e =
     (match e with
       (_, SArrayLit(l)) -> List.length l

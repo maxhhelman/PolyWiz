@@ -542,7 +542,7 @@ int range_plot_many(double **polynomials, int num_polynomials, double range_bott
 //checks if int is inside int array
 bool int_arr_contains(int x, int *arr) {
   int i = -1;
-  while (arr[++i] != INT_MIN) { // NEED TO FIND A WAY TO GET ARRAY LENGTH
+  while (arr[++i] != INT_MIN) { 
     if(arr[i] == x) {
       return true;
     }
@@ -553,7 +553,7 @@ bool int_arr_contains(int x, int *arr) {
 //checks if float is inside float array
 bool float_arr_contains(double x, double *arr) {
   int i = -1;
-  while (arr[++i] != DBL_MIN) { // NEED TO FIND A WAY TO GET ARRAY LENGTH
+  while (arr[++i] != DBL_MIN) { 
     if(arr[i] == x) {
       return true;
     }

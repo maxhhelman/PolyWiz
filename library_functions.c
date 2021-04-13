@@ -10,6 +10,7 @@
 #include <float.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <limits.h>
 
 double pow_operator_ff(double a, double b){
   return pow(a, b);
@@ -538,22 +539,33 @@ int range_plot_many(double **polynomials, int num_polynomials, double range_bott
   return 0;
 }
 
-//check if int is inside int array
+//checks if int is inside int array
 bool int_arr_contains(int x, int *arr) {
-  int n = -1;
-  while (arr[++n]) {
-    if(arr[n] == x) {
+  int i = -1;
+  while (arr[++i] != INT_MIN) { // NEED TO FIND A WAY TO GET ARRAY LENGTH
+    if(arr[i] == x) {
       return true;
     }
   }
   return false;
 }
 
-//check if float is inside float array
-bool float_arr_contains(float x, float *arr) {
-  int n = -1;
-  while (arr[++n]) {
-    if(arr[n] == x) {
+//checks if float is inside float array
+bool float_arr_contains(double x, double *arr) {
+  int i = -1;
+  while (arr[++i] != DBL_MIN) { // NEED TO FIND A WAY TO GET ARRAY LENGTH
+    if(arr[i] == x) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//checks if poly is inside poly array
+bool poly_arr_contains(double *poly, double **poly_arr) {
+  int i = -1;
+  while (poly_arr[++i]) {
+    if(equal_compare_poly(poly, poly_arr[i])) {
       return true;
     }
   }

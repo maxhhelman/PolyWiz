@@ -1,1 +1,0 @@
-set term pngcairo; set output 'plotting/tammyplot.png'; plot 'plotting/polypoints.txt' w l

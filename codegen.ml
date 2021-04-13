@@ -373,15 +373,18 @@ let translate (globals, functions) =
         | SCall ("print_tex", [e]) ->
         let poly_to_tex_external_func = L.declare_function "poly_to_tex" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_tex_external_func [| expr builder e |] "poly_to_tex_llvm" builder
-      | SCall ("plot", [e]) ->
-        let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_t|]) the_module in
-        L.build_call plot_external_func [| expr builder e |] "plot_llvm" builder
-      | SCall ("range_plot", [e1;e2;e3]) ->
+      | SCall ("plot", [e1;e2]) ->
+        let e1' = expr builder e1 in
+        let e2' = expr builder e2 in
+        let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_t; string_t|]) the_module in
+        L.build_call plot_external_func [| e1'; e2' |] "plot_llvm" builder
+      | SCall ("range_plot", [e1;e2;e3;e4]) ->
         let e1' = expr builder e1 in
         let e2' = expr builder e2 in
         let e3' = expr builder e3 in
-        let range_plot_external_func = L.declare_function "range_plot" (L.function_type i32_t [|poly_t; float_t; float_t|]) the_module in
-        L.build_call range_plot_external_func [| e1'; e2'; e3' |] "range_plot_llvm" builder
+        let e4' = expr builder e4 in
+        let range_plot_external_func = L.declare_function "range_plot" (L.function_type i32_t [|poly_t; float_t; float_t; string_t|]) the_module in
+        L.build_call range_plot_external_func [| e1'; e2'; e3'; e4' |] "range_plot_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

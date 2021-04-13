@@ -405,8 +405,14 @@ double poly_at_ind(double *poly, int ind){
   return poly[ind];
 }
 
-int plot(double *poly) {
-  FILE *fp = fopen("plotting/polypoints.txt","w");
+int syscall_gnuplot(char *scriptpath) {
+  char buf[100];
+  sprintf(buf, "gnuplot %s", scriptpath);
+  return system(buf);
+}
+
+int plot(double *poly, char *filepath) {
+  FILE *fp = fopen("polypoints.txt","w");
   double range_bottom = -20.0;
   double range_top = 20.0;
   for (double x_val = range_bottom; x_val < range_top; x_val += 0.2) {
@@ -415,13 +421,24 @@ int plot(double *poly) {
     fprintf(fp, "%lf\t %lf\n", x_val, y_val);
   }
   fclose(fp);
-  int return_code = system("gnuplot plotting/gnu_plotscript");
-  system("rm plotting/polypoints.txt");
+
+  char *plot_script = "gnu_singleplot_script";
+  FILE *sp = fopen(plot_script,"w");
+  fprintf(sp,
+    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l",
+    filepath);
+  fclose(sp);
+
+  int return_code = syscall_gnuplot("gnu_singleplot_script");
+
+  system("rm gnu_singleplot_script");
+  system("rm polypoints.txt");
+
   return return_code;
 }
 
-int range_plot(double *poly, double range_bottom, double range_top) {
-  FILE *fp = fopen("plotting/polypoints.txt","w");
+int range_plot(double *poly, double range_bottom, double range_top, char *filepath) {
+  FILE *fp = fopen("polypoints.txt","w");
   double num_points = 100.0;
   double counter = (range_top - range_bottom) / num_points;
   for (double x_val = range_bottom; x_val < range_top; x_val += counter ) {
@@ -430,8 +447,19 @@ int range_plot(double *poly, double range_bottom, double range_top) {
     fprintf(fp, "%lf\t %lf\n", x_val, y_val);
   }
   fclose(fp);
-  int return_code = system("gnuplot plotting/gnu_rangeplotscript");
-  system("rm plotting/polypoints.txt");
+
+  char *plot_script = "gnu_singleplot_script";
+  FILE *sp = fopen(plot_script,"w");
+  fprintf(sp,
+    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l",
+    filepath);
+  fclose(sp);
+
+  int return_code = syscall_gnuplot("gnu_singleplot_script");
+
+  system("rm gnu_singleplot_script");
+  system("rm polypoints.txt");
+
   return return_code;
 }
 
@@ -442,6 +470,5 @@ int main()
   char s[] = "HELLO WORLD09AZ";
   char *c;
   double curve[] = {4.0, 5.0, 7.0, 8.0, DBL_MIN};
-  plot(curve);
 }
 #endif

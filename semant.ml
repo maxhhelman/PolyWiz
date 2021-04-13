@@ -50,8 +50,8 @@ let check (globals, functions) =
                 else if name="tex_document" then [(Array(String), "x"); (Array(Int), "y")]
                 else if name="print_tex" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
-                else if name="plot" then [(Poly, "x")]
-                else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z")]
+                else if name="plot" then [(Poly, "x");(String, "y")]
+                else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z");(String, "w")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("printint", Int);

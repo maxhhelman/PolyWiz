@@ -3,9 +3,9 @@ def int main()
   int i;
   i = 5;
   while (i > 0) {
-    print(i);
+    printint(i);
     i = i - 1;
   }
-  print(42);
+  printint(42);
   return 0;
 }

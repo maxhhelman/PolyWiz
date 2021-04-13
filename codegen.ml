@@ -342,7 +342,7 @@ let translate (globals, functions) =
       L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder
     | _ -> raise (Failure "This operation is invalid for these operands.")
     )
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
+      | SCall ("printint", [e]) | SCall ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	    "printf" builder
       | SCall ("printf", [e]) ->

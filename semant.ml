@@ -54,7 +54,7 @@ let check (globals, functions) =
                 else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
-    in List.fold_left add_bind StringMap.empty [ ("print", Int);
+    in List.fold_left add_bind StringMap.empty [ ("printint", Int);
 			                         ("printb", Bool);
 			                         ("printf", Float);
 						 ("printstr", String);

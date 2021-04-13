@@ -1,9 +1,9 @@
 def void printem(int a, int b, int c, int d)
 {
-  print(a);
-  print(b);
-  print(c);
-  print(d);
+  printint(a);
+  printint(b);
+  printint(c);
+  printint(d);
 }
 
 def int main()

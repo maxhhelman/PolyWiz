@@ -1,5 +1,5 @@
 def int main()
 {
-  print(39 + 3);
+  printint(39 + 3);
   return 0;
 }

@@ -6,7 +6,7 @@ def int main()
   string intro;
   string outro;
   string fp;
-  ind = [2];
+  ind = [1];
   intro = "Edwards is a good prof";
   outro = "Hans is a chill TA";
   fp = "shrihan.png";
@@ -16,7 +16,6 @@ def int main()
   tex_doc = tex_document(body, ind);
 
   printstr(tex_doc);
-
 
   return 0;
 }

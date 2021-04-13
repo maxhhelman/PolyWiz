@@ -1,6 +1,6 @@
 def int main()
 {
-  if (true) print(42); else print(8);
-  print(17);
+  if (true) printint(42); else printint(8);
+  printint(17);
   return 0;
 }

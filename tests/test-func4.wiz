@@ -9,6 +9,6 @@ def int main()
 {
   int d;
   d = add(52, 10);
-  print(d);
+  printint(d);
   return 0;
 }

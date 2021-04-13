@@ -12,7 +12,7 @@ def int main()
 
   fun(i = 2, i = i+1);
 
-  print(i);
+  printint(i);
   return 0;
 }
 

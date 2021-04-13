@@ -145,9 +145,7 @@ let translate (globals, functions) =
   let printstr_func : L.llvalue =
       L.declare_function "printstr" printstr_t the_module in
   *)
-  
-  let arr_contains_t = L.function_type i32_t [| L.pointer_type i32_t; i32_t |] in
-  let arr_contains_func  = L.declare_function "arr_contains" arr_contains_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -313,6 +311,16 @@ let translate (globals, functions) =
 	      raise (Failure "internal error: semant should have rejected and/or on float")
     | _ -> raise (Failure "This operation is invalid for these operands."))
 
+        | SBinop (((t,_ ) as e1), A.In, ((A.Array(_),_ ) as e2)) -> (* Binary op where e1 (int), e2 (int[]) *)
+    let e1' = expr builder e1 in
+    let e2' = expr builder e2 in
+    (match t with
+      A.Int     -> let int_arr_contains_func = L.declare_function "int_arr_contains" (L.function_type i1_t [| i32_t; int_arr_t |]) the_module in
+        L.build_call int_arr_contains_func [| e1'; e2' |] "int_arr_contains_llvm" builder
+    | A.Float   -> let float_arr_contains_func = L.declare_function "float_arr_contains" (L.function_type i1_t [| float_t; float_arr_t |]) the_module in
+      L.build_call float_arr_contains_func [| e1'; e2' |] "float_arr_contains_llvm" builder
+    | _ -> raise (Failure "This operation is invalid for these operands."))
+
       | SBinop (e1, op, e2) -> (* Binary op where e1, e2 are both ints*)
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
@@ -334,10 +342,6 @@ let translate (globals, functions) =
 	  | A.Geq     -> L.build_icmp L.Icmp.Sge e1' e2' "tmp" builder
     | _ -> raise (Failure "This operation is invalid for these operands.")
 	  )
-      | SBinop (((t,_ ) as e1), op, ((A.Array(_),_ ) as e2)) when op = A.In -> (* Binary op where e2 is an array *)
-    let e1' = expr builder e1
-    and e2' = expr builder e2 in
-                   L.build_call arr_contains_func [| e1'; e2' |] "arr_contains_llvm" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
 	  (match op with

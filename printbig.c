@@ -413,6 +413,27 @@ double poly_at_ind(double *poly, int ind){
   return poly[ind];
 }
 
+//check if int is inside int array
+bool int_arr_contains(int x, int *arr) {
+  int n = -1;
+  while (arr[++n]) {
+    if(arr[n] == x) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//check if float is inside float array
+bool float_arr_contains(float x, float *arr) {
+  int n = -1;
+  while (arr[++n]) {
+    if(arr[n] == x) {
+      return true;
+    }
+  }
+  return false;
+}
 
 #ifdef BUILD_TEST
 int main()

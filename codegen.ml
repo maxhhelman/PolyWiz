@@ -43,7 +43,7 @@ let translate (globals, functions) =
   let float_arr_t = L.pointer_type float_t in
   let int_arr_t = L.pointer_type i32_t in
   let string_arr_t = L.pointer_type string_t in
-
+  let poly_arr_t = L.pointer_type poly_t in
 
 (* Return the LLVM type for a PolyWiz type *)
   let rec ltype_of_typ = function
@@ -200,6 +200,7 @@ let translate (globals, functions) =
           | A.Array(A.Float) -> A.Float
           | A.Array(A.Bool) -> A.Bool
           | A.Array(A.String) -> A.String
+          | A.Array(A.Poly) -> A.Poly
           | _ -> raise (Failure ("Invalid array type")) in
         let array_type = arr_element_type ast_typ in
         instantiate_arr array_type l' builder
@@ -385,6 +386,20 @@ let translate (globals, functions) =
         let e4' = expr builder e4 in
         let range_plot_external_func = L.declare_function "range_plot" (L.function_type i32_t [|poly_t; float_t; float_t; string_t|]) the_module in
         L.build_call range_plot_external_func [| e1'; e2'; e3'; e4' |] "range_plot_llvm" builder
+      | SCall ("plot_many", [e1;e2]) ->
+        let e1' = expr builder e1 in
+        let e2' = expr builder e2 in
+        let len_e1 = L.const_int i32_t (list_length e1) in
+        let plot_many_external_func = L.declare_function "plot_many" (L.function_type i32_t [|poly_arr_t; i32_t; string_t|]) the_module in
+        L.build_call plot_many_external_func [| e1'; len_e1; e2' |] "plot_many_llvm" builder
+      | SCall ("range_plot_many", [e1;e2;e3;e4]) ->
+        let e1' = expr builder e1 in
+        let e2' = expr builder e2 in
+        let e3' = expr builder e3 in
+        let e4' = expr builder e4 in
+        let len_e1 = L.const_int i32_t (list_length e1) in
+        let range_plot_many_external_func = L.declare_function "range_plot_many" (L.function_type i32_t [|poly_arr_t; i32_t; float_t; float_t; string_t|]) the_module in
+        L.build_call range_plot_many_external_func [| e1'; len_e1; e2'; e3'; e4' |] "range_plot_many_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

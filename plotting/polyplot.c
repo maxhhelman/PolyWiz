@@ -60,8 +60,45 @@ int plot(double *poly, char *filepath) {
   return return_code;
 }
 
+int plot_many(double **polynomials, int num_polynomials, char *filepath) {
+
+  FILE *fp = fopen("polypoints.txt","w");
+  double range_bottom = -5.0;
+  double range_top = 5.0;
+  for (double x_val = range_bottom; x_val < range_top; x_val += 0.2) {
+    fprintf(fp, "%lf", x_val);
+    double **polypointer = polynomials;
+    for (int i = 0; i < num_polynomials; i++) {
+      double *temp_poly = *polypointer;
+
+      double y_val = eval_poly(temp_poly, x_val);
+      fprintf(fp, "\t %lf", y_val);
+
+      //printf("%d\n", order(temp_poly));
+      polypointer++;
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  char *plot_script = "gnu_multiplot_script";
+  FILE *sp = fopen(plot_script,"w");
+  fprintf(sp, "set term pngcairo; set output '%s';\nplot ", filepath);
+  for (int i = 0; i < num_polynomials; i++) {
+    fprintf(sp, "'polypoints.txt' using 1:%d w l title 'poly %d', \\\n", i+2, i+1);
+  }
+  fclose(sp);
+
+  int return_code = syscall_gnuplot(plot_script);
+  return 0;
+
+}
+
 int main() {
-  double poly[] = {4.0, 5.0, 7.0, 8.0, DBL_MIN};
-  plot(poly, "maxhelman.png");
+  double poly[3] = {7.0, 1.0, DBL_MIN};
+  double anotherpoly[4] = {-13.0, DBL_MIN};
+  double finalpoly[7] = {-12.0, 3.0, 2.0, DBL_MIN};
+  double *polys[3] = { poly, anotherpoly, finalpoly };
+  plot_many(polys, 3, "maxhelman.png");
   return 0;
 }

@@ -307,7 +307,7 @@ let translate (globals, functions) =
 	      raise (Failure "internal error: semant should have rejected and/or on float")
     | _ -> raise (Failure "This operation is invalid for these operands."))
 
-        | SBinop (((t,_ ) as e1), A.In, ((A.Array(_),_ ) as e2)) -> (* Binary op where e1 (int), e2 (int[]) *)
+        | SBinop (((t,_ ) as e1), A.In, ((A.Array(_),_ ) as e2)) -> (* Binary op where op is "in" *)
     let e1' = expr builder e1 in
     let e2' = expr builder e2 in
     (match t with

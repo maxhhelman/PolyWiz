@@ -42,6 +42,8 @@ let check (globals, functions) =
             else if name="order" then Int
             else if name="plot" then Int
             else if name="range_plot" then Int
+            else if name="plot_many" then Int
+            else if name="range_plot_many" then Int
             else Void;
       fname = name;
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
@@ -52,6 +54,8 @@ let check (globals, functions) =
                 else if name="order" then [(Poly, "x")]
                 else if name="plot" then [(Poly, "x");(String, "y")]
                 else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z");(String, "w")]
+                else if name="plot_many" then [(Array(Poly), "x"); (String, "y")]
+                else if name="range_plot_many" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("printint", Int);
@@ -65,6 +69,8 @@ let check (globals, functions) =
              ("order", Bool);
              ("plot", Bool);
              ("range_plot", Bool);
+             ("plot_many", Bool);
+             ("range_plot_many", Bool);
              ("poly_at_ind", Bool) ]
   in
 
@@ -129,6 +135,7 @@ let check (globals, functions) =
           | (Float,_) -> (Array(Float), SArrayLit l')
           | (Bool,_) -> (Array(Bool), SArrayLit  l')
           | (String,_) -> (Array(String), SArrayLit l')
+          | (Poly,_) -> (Array(Poly), SArrayLit l')
           |  _ ->  raise (Failure ("not a valid array type"))
       else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)

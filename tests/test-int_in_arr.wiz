@@ -9,19 +9,11 @@ def int main()
 
   int_arr = [1, 2, 3, 76, 4];
   i = 76;
-<<<<<<< HEAD
   if (i in int_arr) printint(1); else printint(0);
   
   float_arr = [1.0, 2.25, 3.5, 4.75];
   f = 2.26;
   if (f in float_arr) printint(1); else printint(0);
-=======
-  if (i in int_arr) print(1); else print(0);
-  
-  float_arr = [1.0, 2.25, 3.5, 4.75];
-  f = 2.26;
-  if (f in float_arr) print(1); else print(0);
->>>>>>> 278c353069b82e502c2b09b8738dd4fd9dad2898
 
   return 0;
 }

@@ -42,7 +42,7 @@ let translate (globals, functions) =
   (* array types *)
   let float_arr_t = L.pointer_type float_t in
   let int_arr_t = L.pointer_type i32_t in
-  let bool_are_t = L.pointer_type i1_t in
+  let bool_arr_t = L.pointer_type i1_t in
   let string_arr_t = L.pointer_type string_t in
   let poly_arr_t = L.pointer_type poly_t in
 

@@ -1,7 +1,7 @@
 def int main()
 {
-  print(42);
-  print(71);
-  print(1);
+  printint(42);
+  printint(71);
+  printint(1);
   return 0;
 }

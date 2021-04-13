@@ -3,12 +3,12 @@ int b;
 
 def void printa()
 {
-  print(a);
+  printint(a);
 }
 
 def void printbb()
 {
-  print(b);
+  printint(b);
 }
 
 def void incab()

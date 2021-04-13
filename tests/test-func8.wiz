@@ -1,6 +1,6 @@
 def void foo(int a)
 {
-  print(a + 3);
+  printint(a + 3);
 }
 
 def int main()

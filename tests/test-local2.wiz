@@ -9,6 +9,6 @@ def int foo(int a, bool b)
 }
 
 def int main() {
- print(foo(37, false));
+ printint(foo(37, false));
  return 0;
 }

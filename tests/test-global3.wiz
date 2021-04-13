@@ -6,6 +6,6 @@ def int main()
 {
   i = 42;
   j = 10;
-  print(i + j);
+  printint(i + j);
   return 0;
 }

@@ -11,6 +11,6 @@ def int foo(int a)
 
 def int main()
 {
-  print(foo(7));
+  printint(foo(7));
   return 0;
 }

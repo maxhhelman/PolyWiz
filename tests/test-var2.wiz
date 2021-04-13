@@ -8,6 +8,6 @@ def void foo(int c)
 def int main()
 {
   foo(73);
-  print(a);
+  printint(a);
   return 0;
 }

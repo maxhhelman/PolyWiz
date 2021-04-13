@@ -7,8 +7,8 @@ def int gcd(int a, int b) {
 
 def int main()
 {
-  print(gcd(14,21));
-  print(gcd(8,36));
-  print(gcd(99,121));
+  printint(gcd(14,21));
+  printint(gcd(8,36));
+  printint(gcd(99,121));
   return 0;
 }

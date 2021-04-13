@@ -1,0 +1,19 @@
+def int main()
+{ 
+  int i;
+  float f;
+  bool b;
+  string s;
+  int[] int_arr;
+  float[] float_arr;
+
+  int_arr = [1, 2, 3, 76, 4];
+  i = 76;
+  if (i in int_arr) printint(1); else printint(0);
+  
+  float_arr = [1.0, 2.25, 3.5, 4.75];
+  f = 2.26;
+  if (f in float_arr) printint(1); else printint(0);
+
+  return 0;
+}

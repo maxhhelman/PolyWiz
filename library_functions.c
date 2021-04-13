@@ -536,7 +536,28 @@ int range_plot_many(double **polynomials, int num_polynomials, double range_bott
   system("rm polypoints.txt");
 
   return 0;
+}
 
+//check if int is inside int array
+bool int_arr_contains(int x, int *arr) {
+  int n = -1;
+  while (arr[++n]) {
+    if(arr[n] == x) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//check if float is inside float array
+bool float_arr_contains(float x, float *arr) {
+  int n = -1;
+  while (arr[++n]) {
+    if(arr[n] == x) {
+      return true;
+    }
+  }
+  return false;
 }
 
 #ifdef BUILD_TEST

@@ -1,2 +1,2 @@
 /* Should be illegal to redefine */
-def void print() {}
+def void printint() {}

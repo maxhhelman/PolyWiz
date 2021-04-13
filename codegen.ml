@@ -42,6 +42,7 @@ let translate (globals, functions) =
   (* array types *)
   let float_arr_t = L.pointer_type float_t in
   let int_arr_t = L.pointer_type i32_t in
+  let bool_arr_t = L.pointer_type i1_t in
   let string_arr_t = L.pointer_type string_t in
   let poly_arr_t = L.pointer_type poly_t in
 
@@ -139,6 +140,7 @@ let translate (globals, functions) =
   let printstr_func : L.llvalue =
       L.declare_function "printstr" printstr_t the_module in
   *)
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -208,7 +210,7 @@ let translate (globals, functions) =
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
-      | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (poly), e2 (float) *)
         let e1' = expr builder e1
         and e2' = expr builder e2 in
         (match op with
@@ -219,7 +221,7 @@ let translate (globals, functions) =
           | _ -> raise (Failure "This operation is invalid for a poly and float operand.")
         )
 
-      | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
+      | SBinop (((A.Poly,_ ) as e1), op, ((A.Poly,_ ) as e2)) -> (* Binary op where e1 (poly), e2 (poly) *)
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
 	  (match op with
@@ -305,7 +307,19 @@ let translate (globals, functions) =
 	      raise (Failure "internal error: semant should have rejected and/or on float")
     | _ -> raise (Failure "This operation is invalid for these operands."))
 
-      | SBinop (e1, op, e2) -> (* Binary op where e1, e1 are both ints*)
+        | SBinop (((t,_ ) as e1), A.In, ((A.Array(_),_ ) as e2)) -> (* Binary op where op is "in" *)
+    let e1' = expr builder e1 in
+    let e2' = expr builder e2 in
+    (match t with
+      A.Int     -> let int_arr_contains_func = L.declare_function "int_arr_contains" (L.function_type i1_t [| i32_t; int_arr_t |]) the_module in
+        L.build_call int_arr_contains_func [| e1'; e2'|] "int_arr_contains_llvm" builder
+    | A.Float   -> let float_arr_contains_func = L.declare_function "float_arr_contains" (L.function_type i1_t [| float_t; float_arr_t |]) the_module in
+      L.build_call float_arr_contains_func [| e1'; e2' |] "float_arr_contains_llvm" builder
+    | A.Poly    -> let poly_arr_contains_func = L.declare_function "poly_arr_contains" (L.function_type i1_t [| poly_t; poly_arr_t |]) the_module in
+      L.build_call poly_arr_contains_func [| e1'; e2' |] "poly_arr_contains_llvm" builder
+    | _ -> raise (Failure "This operation is invalid for these operands."))
+
+      | SBinop (e1, op, e2) -> (* Binary op where e1, e2 are both ints*)
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
 	  (match op with

@@ -561,6 +561,16 @@ bool float_arr_contains(double x, double *arr) {
   return false;
 }
 
+bool string_arr_contains(char *x, char **arr) {
+  int i = -1;
+  while (arr[++i]) { 
+    if(arr[i] == x) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //checks if poly is inside poly array
 bool poly_arr_contains(double *poly, double **poly_arr) {
   int i = -1;

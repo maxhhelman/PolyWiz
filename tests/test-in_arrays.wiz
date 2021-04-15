@@ -2,11 +2,13 @@ def int main()
 { 
   int i;
   float f;
+  string s;
   poly p1;
   poly p2;
   poly p3;
   int[] int_arr;
   float[] float_arr;
+  string[] string_arr;
   poly[] poly_arr;
 
   i = 50;
@@ -25,6 +27,12 @@ def int main()
   }
   else if (8.9 in float_arr) {
     printint(1); 
+  }
+
+  s = "wanker";
+  string_arr = ["hello", "world", "", "wanker"];
+  if (s in string_arr) {
+    printint(1);
   }
 
   p1 = new_poly([1.0, 2.1, 4.0], [2, 1, 0]);

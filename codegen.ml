@@ -315,6 +315,8 @@ let translate (globals, functions) =
         L.build_call int_arr_contains_func [| e1'; e2'|] "int_arr_contains_llvm" builder
     | A.Float   -> let float_arr_contains_func = L.declare_function "float_arr_contains" (L.function_type i1_t [| float_t; float_arr_t |]) the_module in
       L.build_call float_arr_contains_func [| e1'; e2' |] "float_arr_contains_llvm" builder
+    | A.String  -> let string_arr_contains_func = L.declare_function "string_arr_contains" (L.function_type i1_t [| string_t; string_arr_t |]) the_module in
+      L.build_call string_arr_contains_func [| e1'; e2' |] "string_arr_contains_llvm" builder
     | A.Poly    -> let poly_arr_contains_func = L.declare_function "poly_arr_contains" (L.function_type i1_t [| poly_t; poly_arr_t |]) the_module in
       L.build_call poly_arr_contains_func [| e1'; e2' |] "poly_arr_contains_llvm" builder
     | _ -> raise (Failure "This operation is invalid for these operands."))

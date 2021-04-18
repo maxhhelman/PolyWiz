@@ -42,8 +42,6 @@ let check (globals, functions) =
             else if name="order" then Int
             else if name="plot" then Int
             else if name="range_plot" then Int
-            else if name="plot_many" then Int
-            else if name="range_plot_many" then Int
             else Void;
       fname = name;
       formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
@@ -52,10 +50,8 @@ let check (globals, functions) =
                 else if name="tex_document" then [(Array(String), "x"); (Array(Int), "y")]
                 else if name="print_tex" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
-                else if name="plot" then [(Poly, "x");(String, "y")]
-                else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z");(String, "w")]
-                else if name="plot_many" then [(Array(Poly), "x"); (String, "y")]
-                else if name="range_plot_many" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
+                else if name="plot" then [(Array(Poly), "x"); (String, "y")]
+                else if name="range_plot" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("printint", Int);
@@ -69,8 +65,6 @@ let check (globals, functions) =
              ("order", Bool);
              ("plot", Bool);
              ("range_plot", Bool);
-             ("plot_many", Bool);
-             ("range_plot_many", Bool);
              ("poly_at_ind", Bool) ]
   in
 

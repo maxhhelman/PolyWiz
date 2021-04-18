@@ -8,7 +8,7 @@ def int main()
   poly2 = new_poly([7.0, 4.0], [1, 0]);
   poly_product = poly1 * poly2;
 
-  printint(range_plot_many([poly1, poly2, poly_product], 1.0, 3.0, "plotting/tammyrangeplot.png"));
+  printint(plot([ 1.0, 3.0, 4.0 ], "plotting/plot_single.png"));
 
   return 0;
 }

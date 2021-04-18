@@ -50,14 +50,11 @@ int order(double *poly){
   return poly_order;
 }
 
-double* new_poly(double *consts, int consts_length, int *exponents, int exponents_length){
-  //if unequal size of consts and exponents arrays
-  if ( consts_length != exponents_length )
-    return NULL;
+double* new_poly(double *consts, int *exponents, int arr_lengths){
 
   //find the order of the polynomial
   int order = -1;
-  for(int i=0; i < exponents_length; i++){
+  for(int i=0; i < arr_lengths; i++){
     order = exponents[i]>order ? exponents[i]: order;
   }
   if(order<0) return NULL;
@@ -71,7 +68,7 @@ double* new_poly(double *consts, int consts_length, int *exponents, int exponent
   poly_arr[order+1] = DBL_MIN;
 
   //fill poly array with inputted constants and exponents
-  for(int i=0; i < exponents_length; i++){
+  for(int i=0; i < arr_lengths; i++){
     int exponent = exponents[i];
     double constant = consts[i];
     poly_arr[exponent] = constant;
@@ -527,6 +524,47 @@ bool poly_arr_contains(double *poly, double **poly_arr) {
   }
   return false;
 }
+
+//get int array element at ind
+int arr_at_ind_i(int *arr, int ind) {
+  return arr[ind];
+}
+//get double array element at ind
+double arr_at_ind_f(double *arr, int ind) {
+  return arr[ind];
+}
+
+//set array value at ind for float arrays
+double* set_arr_at_ind_f(double *arr, double el, int ind) {
+  arr[ind] = el;
+  return arr;
+}
+//set array value at ind for int arrays
+int* set_arr_at_ind_i(int *arr, int el, int ind) {
+  arr[ind] = el;
+  return arr;
+}
+
+//instantiate float array with zeros
+double* initialize_floats(int length){
+  double *arr = malloc(length * sizeof (double));
+  for(int i=0; i<length; i++)
+    arr[i] = 0.0;
+  return arr;
+}
+//instantiate int array with zeros
+int* initialize_ints(int length){
+  int *arr = malloc(length * sizeof (int));
+  for(int i=0; i<length; i++)
+    arr[i] = 0;
+  return arr;
+}
+
+//convert an int to a float
+double int_to_float(int number){
+  return (double) number;
+}
+
 
 #ifdef BUILD_TEST
 int main()

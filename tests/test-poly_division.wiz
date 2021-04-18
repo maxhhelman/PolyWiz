@@ -4,7 +4,7 @@ def int main()
   float denominator;
   poly poly_quotient;
 
-  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0]);
+  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0], 3);
   denominator = 2.0;
   poly_quotient = poly1 / denominator;
 

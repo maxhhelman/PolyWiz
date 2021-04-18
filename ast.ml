@@ -1,7 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          In | And | Or | Exp | Compo | Eval
+          In | And | Or | Exp | Compo | Eval | Ele_at_ind
 
 type uop = Neg | Not | Abs | Const_ret
 
@@ -18,6 +18,7 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
+  | ArrAssignInd of expr * expr * expr
   | Assign of string * expr
   | Call of string * expr list
   | Noexpr
@@ -63,6 +64,7 @@ let string_of_op = function
   | Or -> "or"
   | Compo -> ":"
   | Eval -> "@"
+  | Ele_at_ind -> "[]"
 
 
   let string_of_uop = function
@@ -89,6 +91,7 @@ let rec string_of_expr = function
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e ^ string_of_2nd_uop o
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | ArrAssignInd(arr, ind, e) -> " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""

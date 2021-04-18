@@ -3,7 +3,7 @@ def int main()
   poly poly1;
   string poly1_as_string;
 
-  poly1 = new_poly([-1.0, -2.0, -4.0], [2, 1, 0]);
+  poly1 = new_poly([-1.0, -2.0, -4.0], [2, 1, 0], 3);
 
   poly1_as_string = print_tex(poly1);
 

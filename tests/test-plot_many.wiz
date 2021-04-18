@@ -4,8 +4,8 @@ def int main()
   poly poly2;
   poly poly_product;
 
-  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0]);
-  poly2 = new_poly([7.0, 4.0], [1, 0]);
+  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0], 3);
+  poly2 = new_poly([7.0, 4.0], [1, 0], 2);
   poly_product = poly1 * poly2;
 
   printint(plot([poly1, poly2, poly_product], "plotting/plot_many.png"));

@@ -35,9 +35,9 @@ def int main()
     printint(1);
   }
 
-  p1 = new_poly([1.0, 2.1, 4.0], [2, 1, 0]);
-  p2 = new_poly([1.0, -1.0, 3.2, 0.0], [4, 2, 1, 0]);
-  p3 = new_poly([1.0, -1.0, 3.3, 0.0], [3, 2, 1, 0]);
+  p1 = new_poly([1.0, 2.1, 4.0], [2, 1, 0], 3);
+  p2 = new_poly([1.0, -1.0, 3.2, 0.0], [4, 2, 1, 0], 4);
+  p3 = new_poly([1.0, -1.0, 3.3, 0.0], [3, 2, 1, 0], 4);
   poly_arr = [p1, p2];
   if (p2 in poly_arr and p1 in poly_arr) {
     printint(1);

@@ -42,14 +42,24 @@ let check (globals, functions) =
             else if name="order" then Int
             else if name="plot" then Int
             else if name="range_plot" then Int
+            else if name="plot_many" then Int
+            else if name="range_plot_many" then Int
+            else if name="initialize_floats" then Array(Float)
+            else if name="initialize_ints" then Array(Int)
+            else if name="int_to_float" then Float
             else Void;
       fname = name;
-      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "z")]
+      formals = if name="new_poly" then [(Array(Float), "x"); (Array(Int), "y"); (Int, "z")]
                 else if name="poly_at_ind" then [(Poly, "x");(Int, "y")]
                 else if name="to_str" then [(Poly, "x")]
                 else if name="tex_document" then [(Array(String), "x"); (Array(Int), "y")]
                 else if name="print_tex" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
+                else if name="plot_many" then [(Array(Poly), "x"); (String, "y")]
+                else if name="range_plot_many" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
+                else if name="initialize_floats" then [(Int, "x")]
+                else if name="initialize_ints" then [(Int, "x")]
+                else if name="int_to_float" then [(Int, "x")]
                 else if name="plot" then [(Array(Poly), "x"); (String, "y")]
                 else if name="range_plot" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
                 else  [(ty, "x")];
@@ -65,6 +75,11 @@ let check (globals, functions) =
              ("order", Bool);
              ("plot", Bool);
              ("range_plot", Bool);
+             ("plot_many", Bool);
+             ("range_plot_many", Bool);
+             ("initialize_floats", Bool);
+             ("initialize_ints", Bool);
+             ("int_to_float", Bool);
              ("poly_at_ind", Bool) ]
   in
 
@@ -134,6 +149,16 @@ let check (globals, functions) =
       else (Void, SArrayLit([]))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
+      | ArrAssignInd(e1, ind, e) as ex ->
+          let (lt_arr, _) = expr e1 in
+          let lt = (match lt_arr with
+            Array(Int) -> Int
+            |Array(Float) -> Float
+          ) in
+          let (rt, e') = expr e in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
+            string_of_typ rt ^ " in " ^ string_of_expr ex in
+          (check_assign lt rt err, SArrAssignInd(expr e1, expr ind, (rt, e')))
       | Assign(var, e) as ex ->
           let lt = type_of_identifier var
           and (rt, e') = expr e in
@@ -169,6 +194,10 @@ let check (globals, functions) =
                      when same && (t1 = Int || t1 = Float) -> Bool
           | In when t2=Array(t1) -> Bool
           | And | Or when same && t1 = Bool -> Bool
+          | Ele_at_ind -> (match t1 with
+                Array(Int) -> Int
+              | Array(Float) -> Float
+            )
           | _ -> raise (
 	      Failure ("illegal binary operator " ^
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^

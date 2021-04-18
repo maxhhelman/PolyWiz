@@ -1,0 +1,49 @@
+/* function to take derivative of polynomial */
+def float[] derivative(float[] consts_arr, int poly_order){
+  float[] poly_derivative;
+  int i;
+  poly_derivative = instantiate_floats(poly_order);
+  
+  /* use calculus techniques to get derivative of each term */
+  for(i=0; i<=poly_order; i=i+1){
+    if(i>0){
+      poly_derivative[i-1] = consts_arr[i] * int_to_float(i);
+    }
+  }
+  
+  return poly_derivative;
+}
+
+
+def int main()
+{
+  poly poly_original;
+  poly poly_derivative;
+  float[] consts_arr;
+  int i;
+  int poly_original_order;
+  float[] poly_derivative_consts;
+  int[] poly_derivative_exps; 
+  poly_derivative_exps = instantiate_ints(2);
+  
+  poly_original = new_poly([3.1, 10.0, 4.0], [2, 1, 0], 3);
+  poly_original_order = order(poly_original);
+  printstr(to_str(poly_original));
+  
+  consts_arr = poly_original#;
+  
+  poly_derivative_consts = derivative(consts_arr, poly_original_order);
+  /* create the exponents array of derivative poly */
+  
+  for(i=0; i<poly_original_order; i=i+1){
+    poly_derivative_exps[i] = i;
+  }
+
+  poly_derivative = new_poly(poly_derivative_consts, poly_derivative_exps, poly_original_order);
+  printstr(to_str(poly_derivative));
+  
+  /* plot poly_original and poly_derivative together */
+  
+
+  return 0;
+}

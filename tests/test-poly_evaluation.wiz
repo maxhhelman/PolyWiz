@@ -4,7 +4,7 @@ def int main()
   float x;
   float poly1_at_x;
 
-  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0]);
+  poly1 = new_poly([1.0, 2.0, 4.0], [2, 1, 0], 3);
   x = 3.0;
   poly1_at_x = poly1 @ x;
 

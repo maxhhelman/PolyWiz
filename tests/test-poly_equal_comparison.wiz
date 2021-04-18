@@ -3,8 +3,8 @@ def int main()
   poly poly1;
   poly poly2;
 
-  poly1 = new_poly([0.0, 0.0, 4.0], [3, 1, 0]);
-  poly2 = new_poly([4.0], [0]);
+  poly1 = new_poly([0.0, 0.0, 4.0], [3, 1, 0], 3);
+  poly2 = new_poly([4.0], [0], 1);
 
   printb(poly1 == poly2);
 

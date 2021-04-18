@@ -109,7 +109,8 @@ let translate (globals, functions) =
       (_, SArrayLit(l)) -> List.length l
       | _ -> 0
     ) in
-  let list_ele e ind =
+  (*
+  let int_list_ele e ind =
     (match e with
       (A.Array(t), SArrayLit(l)) ->
         let l0=List.nth l ind in
@@ -119,6 +120,7 @@ let translate (globals, functions) =
         )
       | _ -> 0
     ) in
+  *)
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -208,6 +210,22 @@ let translate (globals, functions) =
         instantiate_arr array_type l' builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
+      | SArrAssignInd (e1, ind, e) -> 
+          let e' = expr builder e in
+          let ind_llvm = expr builder ind in
+          let arr = expr builder e1 in
+          ignore (
+            (match e1 with
+              (A.Array(A.Float), SId(arrName)) -> 
+                let set_arr_at_ind_f_external_func = L.declare_function "set_arr_at_ind_f" (L.function_type float_arr_t [|float_arr_t; float_t; i32_t|]) the_module in
+                let new_arr = L.build_call set_arr_at_ind_f_external_func [|arr; e'; ind_llvm|] "set_arr_at_ind_f_llvm" builder in
+                L.build_store new_arr (lookup arrName) builder
+              |(A.Array(A.Int), SId(arrName)) -> 
+                let set_arr_at_ind_i_external_func = L.declare_function "set_arr_at_ind_i" (L.function_type int_arr_t [|int_arr_t; i32_t; i32_t|]) the_module in
+                let new_arr = L.build_call set_arr_at_ind_i_external_func [|arr; e'; ind_llvm|] "set_arr_at_ind_i_llvm" builder in
+                L.build_store new_arr (lookup arrName) builder
+            )
+          ); e'
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (((A.Poly,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (poly), e2 (float) *)
@@ -244,6 +262,21 @@ let translate (globals, functions) =
 	  | A.Geq     -> raise (Failure "internal error: semant should have rejected >= on poly")
 	  | A.And | A.Or -> raise (Failure "internal error: semant should have rejected and/or on poly")
     | _ -> raise (Failure "This operation is invalid for two poly operands."))
+
+    | SBinop (((A.Array(arr_typ),_ ) as e1), op, ((A.Int,_ ) as e2)) -> (* Binary op where e1 (array), e2 (int) *)
+	  let e1' = expr builder e1
+	  and e2' = expr builder e2 in
+	  (match op with
+	    A.Ele_at_ind     -> (
+        match arr_typ with
+            A.Int -> 
+              let arr_at_ind_i_external_func = L.declare_function "arr_at_ind_i" (L.function_type i32_t [|int_arr_t;i32_t|]) the_module in
+              L.build_call arr_at_ind_i_external_func [| e1'; e2' |] "arr_at_ind_i_llvm" builder
+          | A.Float -> 
+              let arr_at_ind_f_external_func = L.declare_function "arr_at_ind_f" (L.function_type float_t [|float_arr_t;i32_t|]) the_module in
+              L.build_call arr_at_ind_f_external_func [| e1'; e2' |] "arr_at_ind_f_llvm" builder
+      )
+    )
 
       | SBinop (((A.Float,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
 	  let e1' = expr builder e1
@@ -367,20 +400,27 @@ let translate (globals, functions) =
 	    "printf" builder
       | SCall ("printstr", [e]) ->
 	  L.build_call printf_func [| str_format_str ; (expr builder e) |] "printf" builder
-      | SCall ("new_poly", [e1;e2]) ->
+      | SCall ("new_poly", [e1;e2;e3]) ->
         let e1' = expr builder e1 in
         let e2' = expr builder e2 in
-        (*raise (Failure (string_of_int (list_ele e2 0)));*)
-        let len_e1 = L.const_int i32_t (list_length e1) in
-        let len_e2 = L.const_int i32_t (list_length e2) in
-        let new_poly_external_func = L.declare_function "new_poly" (L.function_type poly_t [|float_arr_t; i32_t; int_arr_t; i32_t|]) the_module in
-        L.build_call new_poly_external_func [| e1'; len_e1; e2'; len_e2|] "new_poly_llvm" builder
+        let e3' = expr builder e3 in
+        let new_poly_external_func = L.declare_function "new_poly" (L.function_type poly_t [|float_arr_t; int_arr_t; i32_t|]) the_module in
+        L.build_call new_poly_external_func [| e1'; e2'; e3'|] "new_poly_llvm" builder
       | SCall ("poly_at_ind", [e1;e2]) ->
         let poly_at_ind_external_func = L.declare_function "poly_at_ind" (L.function_type float_t [|poly_t; i32_t|]) the_module in
         L.build_call poly_at_ind_external_func [| expr builder e1; expr builder e2 |] "poly_at_ind_llvm" builder
       | SCall ("order", [e]) ->
         let order_external_func = L.declare_function "order" (L.function_type i32_t [|poly_t|]) the_module in
         L.build_call order_external_func [| expr builder e |] "order_llvm" builder
+      | SCall ("instantiate_floats", [e]) ->
+        let instantiate_floats_external_func = L.declare_function "instantiate_floats" (L.function_type float_arr_t [|i32_t|]) the_module in
+        L.build_call instantiate_floats_external_func [| expr builder e |] "instantiate_floats_llvm" builder
+      | SCall ("instantiate_ints", [e]) ->
+        let instantiate_ints_external_func = L.declare_function "instantiate_ints" (L.function_type int_arr_t [|i32_t|]) the_module in
+        L.build_call instantiate_ints_external_func [| expr builder e |] "instantiate_ints_llvm" builder
+      | SCall ("int_to_float", [e]) ->
+        let int_to_float_external_func = L.declare_function "int_to_float" (L.function_type float_t [|i32_t|]) the_module in
+        L.build_call int_to_float_external_func [| expr builder e |] "int_to_float_llvm" builder
       | SCall ("to_str", [e]) ->
         let poly_to_str_external_func = L.declare_function "poly_to_str" (L.function_type string_t [|poly_t|]) the_module in
         L.build_call poly_to_str_external_func [| expr builder e |] "poly_to_str_llvm" builder

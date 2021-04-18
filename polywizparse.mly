@@ -132,9 +132,11 @@ expr:
   | expr IN     expr { Binop($1, In,   $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
+  | expr LBRACK expr RBRACK { Binop($1, Ele_at_ind, $3) }
   | ABS expr ABS     { Unop(Abs, $2)          }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
+  | expr LBRACK expr RBRACK ASSIGN expr { ArrAssignInd($1, $3, $6) }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }

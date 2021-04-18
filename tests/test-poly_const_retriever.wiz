@@ -7,12 +7,11 @@ def int main()
   poly1 = new_poly([3.1, 10.0, 4.0], [3, 1, 0], 3);
   
   consts_arr = poly1#;
-  /*
+
   for(i=0 ; i <= order(poly1) ; i=i+1){
     printf( consts_arr[i] );
     printstr("\n");
   }
-  */
 
   return 0;
 }

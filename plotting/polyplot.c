@@ -48,15 +48,44 @@ int plot(double *poly, char *filepath) {
   }
   fclose(fp);
 
-  char *plot_script = "gnu_standardplot_script";
+  char *plot_script = "gnu_singleplot_script";
   FILE *sp = fopen(plot_script,"w");
   fprintf(sp,
-    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l",
+    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l title 'poly'",
     filepath);
   fclose(sp);
 
-  int return_code = syscall_gnuplot("gnu_standardplot_script");
+  int return_code = syscall_gnuplot("gnu_singleplot_script");
+
+  system("rm gnu_singleplot_script");
   system("rm polypoints.txt");
+
+  return return_code;
+}
+
+int range_plot(double *poly, double range_bottom, double range_top, char *filepath) {
+  FILE *fp = fopen("polypoints.txt","w");
+  double num_points = 100.0;
+  double counter = (range_top - range_bottom) / num_points;
+  for (double x_val = range_bottom; x_val < range_top; x_val += counter ) {
+    int poly_order = order(poly);
+    double y_val = eval_poly(poly, x_val);
+    fprintf(fp, "%lf\t %lf\n", x_val, y_val);
+  }
+  fclose(fp);
+
+  char *plot_script = "gnu_singleplot_script";
+  FILE *sp = fopen(plot_script,"w");
+  fprintf(sp,
+    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l title 'poly'",
+    filepath);
+  fclose(sp);
+
+  int return_code = syscall_gnuplot("gnu_singleplot_script");
+
+  system("rm gnu_singleplot_script");
+  system("rm polypoints.txt");
+
   return return_code;
 }
 

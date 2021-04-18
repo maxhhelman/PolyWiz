@@ -44,8 +44,8 @@ let check (globals, functions) =
             else if name="range_plot" then Int
             else if name="plot_many" then Int
             else if name="range_plot_many" then Int
-            else if name="instantiate_floats" then Array(Float)
-            else if name="instantiate_ints" then Array(Int)
+            else if name="initialize_floats" then Array(Float)
+            else if name="initialize_ints" then Array(Int)
             else if name="int_to_float" then Float
             else Void;
       fname = name;
@@ -55,13 +55,13 @@ let check (globals, functions) =
                 else if name="tex_document" then [(Array(String), "x"); (Array(Int), "y")]
                 else if name="print_tex" then [(Poly, "x")]
                 else if name="order" then [(Poly, "x")]
-                else if name="plot" then [(Poly, "x");(String, "y")]
-                else if name="range_plot" then [(Poly, "x");(Float, "y");(Float, "z");(String, "w")]
                 else if name="plot_many" then [(Array(Poly), "x"); (String, "y")]
                 else if name="range_plot_many" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
-                else if name="instantiate_floats" then [(Int, "x")]
-                else if name="instantiate_ints" then [(Int, "x")]
+                else if name="initialize_floats" then [(Int, "x")]
+                else if name="initialize_ints" then [(Int, "x")]
                 else if name="int_to_float" then [(Int, "x")]
+                else if name="plot" then [(Array(Poly), "x"); (String, "y")]
+                else if name="range_plot" then [(Array(Poly), "x");(Float, "y");(Float, "z");(String, "y")]
                 else  [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("printint", Int);
@@ -77,8 +77,8 @@ let check (globals, functions) =
              ("range_plot", Bool);
              ("plot_many", Bool);
              ("range_plot_many", Bool);
-             ("instantiate_floats", Bool);
-             ("instantiate_ints", Bool);
+             ("initialize_floats", Bool);
+             ("initialize_ints", Bool);
              ("int_to_float", Bool);
              ("poly_at_ind", Bool) ]
   in

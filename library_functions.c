@@ -409,59 +409,7 @@ int syscall_gnuplot(char *scriptpath) {
   return system(buf);
 }
 
-int plot(double *poly, char *filepath) {
-  FILE *fp = fopen("polypoints.txt","w");
-  double range_bottom = -20.0;
-  double range_top = 20.0;
-  for (double x_val = range_bottom; x_val < range_top; x_val += 0.2) {
-    int poly_order = order(poly);
-    double y_val = eval_poly(poly, x_val);
-    fprintf(fp, "%lf\t %lf\n", x_val, y_val);
-  }
-  fclose(fp);
-
-  char *plot_script = "gnu_singleplot_script";
-  FILE *sp = fopen(plot_script,"w");
-  fprintf(sp,
-    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l title 'poly'",
-    filepath);
-  fclose(sp);
-
-  int return_code = syscall_gnuplot("gnu_singleplot_script");
-
-  system("rm gnu_singleplot_script");
-  system("rm polypoints.txt");
-
-  return return_code;
-}
-
-int range_plot(double *poly, double range_bottom, double range_top, char *filepath) {
-  FILE *fp = fopen("polypoints.txt","w");
-  double num_points = 100.0;
-  double counter = (range_top - range_bottom) / num_points;
-  for (double x_val = range_bottom; x_val < range_top; x_val += counter ) {
-    int poly_order = order(poly);
-    double y_val = eval_poly(poly, x_val);
-    fprintf(fp, "%lf\t %lf\n", x_val, y_val);
-  }
-  fclose(fp);
-
-  char *plot_script = "gnu_singleplot_script";
-  FILE *sp = fopen(plot_script,"w");
-  fprintf(sp,
-    "set term pngcairo; set output '%s'; plot 'polypoints.txt' w l title 'poly'",
-    filepath);
-  fclose(sp);
-
-  int return_code = syscall_gnuplot("gnu_singleplot_script");
-
-  system("rm gnu_singleplot_script");
-  system("rm polypoints.txt");
-
-  return return_code;
-}
-
-int plot_many(double **polynomials, int num_polynomials, char *filepath) {
+int plot(double **polynomials, int num_polynomials, char *filepath) {
 
   FILE *fp = fopen("polypoints.txt","w");
   double range_bottom = -5.0;
@@ -475,7 +423,6 @@ int plot_many(double **polynomials, int num_polynomials, char *filepath) {
       double y_val = eval_poly(temp_poly, x_val);
       fprintf(fp, "\t %lf", y_val);
 
-      //printf("%d\n", order(temp_poly));
       polypointer++;
     }
     fprintf(fp, "\n");
@@ -495,11 +442,11 @@ int plot_many(double **polynomials, int num_polynomials, char *filepath) {
   system("rm gnu_multiplot_script");
   system("rm polypoints.txt");
 
-  return 0;
+  return return_code;
 
 }
 
-int range_plot_many(double **polynomials, int num_polynomials, double range_bottom, double range_top, char *filepath) {
+int range_plot(double **polynomials, int num_polynomials, double range_bottom, double range_top, char *filepath) {
 
   FILE *fp = fopen("polypoints.txt","w");
   double num_points = 100.0;
@@ -513,7 +460,6 @@ int range_plot_many(double **polynomials, int num_polynomials, double range_bott
       double y_val = eval_poly(temp_poly, x_val);
       fprintf(fp, "\t %lf", y_val);
 
-      //printf("%d\n", order(temp_poly));
       polypointer++;
     }
     fprintf(fp, "\n");
@@ -533,7 +479,7 @@ int range_plot_many(double **polynomials, int num_polynomials, double range_bott
   system("rm gnu_multiplot_script");
   system("rm polypoints.txt");
 
-  return 0;
+  return return_code;
 }
 
 //checks if int is inside int array
@@ -600,14 +546,14 @@ int* set_arr_at_ind_i(int *arr, int el, int ind) {
 }
 
 //instantiate float array with zeros
-double* instantiate_floats(int length){
+double* initialize_floats(int length){
   double *arr = malloc(length * sizeof (double));
   for(int i=0; i<length; i++)
     arr[i] = 0.0;
   return arr;
 }
 //instantiate int array with zeros
-int* instantiate_ints(int length){
+int* initialize_ints(int length){
   int *arr = malloc(length * sizeof (int));
   for(int i=0; i<length; i++)
     arr[i] = 0;

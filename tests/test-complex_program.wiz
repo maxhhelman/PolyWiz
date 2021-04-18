@@ -1,8 +1,27 @@
-/* function to take derivative of polynomial */
+/*
+
+Interesting program that proves the Mean Value Theorem's underlying property.
+
+It does this through the following steps:
+
+1) Creates a poly, called poly_original
+2) Builds a function to get poly_original's derivative, called poly_derivative
+3) Calculates the average slope between two endpoints of poly_original
+4) Iterate over values on poly_derivative to find the point of the average slope
+5) If this point is found, for any polynomial, then the property behind
+      the Mean Value Theorem holds. 
+
+This program also plots poly_original and poly_derivative on the same graph
+to help visualize the problem.
+
+*/
+
+
+/* user-defined function to take derivative of polynomial */
 def float[] derivative(float[] consts_arr, int poly_order){
   float[] poly_derivative;
   int i;
-  poly_derivative = instantiate_floats(poly_order);
+  poly_derivative = initialize_floats(poly_order);
   
   /* use calculus techniques to get derivative of each term */
   for(i=0; i<=poly_order; i=i+1){
@@ -14,9 +33,61 @@ def float[] derivative(float[] consts_arr, int poly_order){
   return poly_derivative;
 }
 
+/* user-defined function to calculate the average slope between two points */
+def float slope(float x1, float y1, float x2, float y2){
+  return (y2-y1)/(x2-x1);
+}
+
+/* user-defined function to get severeal values of polynomial */
+def float[] poly_values(poly p, float x1, float x2, int num_of_points){
+  float[] values;
+  float current_x;
+  float delta_x;
+  float temp;
+  int i;
+  values = initialize_floats(num_of_points);
+
+  /* guarentee x2 > x1 */
+  if(x1 > x2){
+    temp = x2;
+    x2 = x1;
+    x1 = temp;
+  }
+
+  current_x = x1;
+  delta_x = (x2-x1) / int_to_float(num_of_points);
+  for(i=0; i<num_of_points; i=i+1){
+    values[i] = p @ current_x;
+    current_x = current_x + delta_x;
+  }
+
+  return values;
+}
+
+/* user-defined function to find if value in arr by some err margin */
+def bool approx_in(float value, float[] arr, int arr_len, float err){
+  bool in_arr;
+  int i;
+
+  in_arr = false;
+
+  /* force err to be a positive value */
+  err = | err |;
+
+  /* check if value is in arr by margin of err */
+  for(i=0; i<arr_len; i=i+1){
+    if( |arr[i]-value| <= err){
+      in_arr = true;
+    }
+  }
+
+  return in_arr;
+}
+
 
 def int main()
 {
+  /* instantiate variables */
   poly poly_original;
   poly poly_derivative;
   float[] consts_arr;
@@ -24,7 +95,12 @@ def int main()
   int poly_original_order;
   float[] poly_derivative_consts;
   int[] poly_derivative_exps; 
-  poly_derivative_exps = instantiate_ints(2);
+  float average_slope;
+  float x1;
+  float x2;
+  float err;
+  float[] derivative_values;
+  poly_derivative_exps = initialize_ints(2);
   
   poly_original = new_poly([3.1, 10.0, 4.0], [2, 1, 0], 3);
   poly_original_order = order(poly_original);
@@ -33,17 +109,32 @@ def int main()
   consts_arr = poly_original#;
   
   poly_derivative_consts = derivative(consts_arr, poly_original_order);
+
   /* create the exponents array of derivative poly */
-  
   for(i=0; i<poly_original_order; i=i+1){
     poly_derivative_exps[i] = i;
   }
 
   poly_derivative = new_poly(poly_derivative_consts, poly_derivative_exps, poly_original_order);
   printstr(to_str(poly_derivative));
+
+  x1 = -5.0;
+  x2 = 5.0;
   
   /* plot poly_original and poly_derivative together */
+
+
+  /* calculate average slope of poly_original in range x1, x2 */
+  average_slope = slope(x1, poly_original @ x1, x2, poly_original @ x2);
   
+  /* collect several values on poly_derivative */
+  derivative_values = poly_values(poly_derivative, x1, x2, 1000);
+
+  err = 0.3;
+  /* if slope is in poly_derivative's values by margin of err */
+  if( approx_in(average_slope, derivative_values, 1000, err) ){
+    printstr("The Mean Value Theorem holds!");
+  }
 
   return 0;
 }

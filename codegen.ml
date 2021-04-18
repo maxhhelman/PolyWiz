@@ -412,12 +412,12 @@ let translate (globals, functions) =
       | SCall ("order", [e]) ->
         let order_external_func = L.declare_function "order" (L.function_type i32_t [|poly_t|]) the_module in
         L.build_call order_external_func [| expr builder e |] "order_llvm" builder
-      | SCall ("instantiate_floats", [e]) ->
-        let instantiate_floats_external_func = L.declare_function "instantiate_floats" (L.function_type float_arr_t [|i32_t|]) the_module in
-        L.build_call instantiate_floats_external_func [| expr builder e |] "instantiate_floats_llvm" builder
-      | SCall ("instantiate_ints", [e]) ->
-        let instantiate_ints_external_func = L.declare_function "instantiate_ints" (L.function_type int_arr_t [|i32_t|]) the_module in
-        L.build_call instantiate_ints_external_func [| expr builder e |] "instantiate_ints_llvm" builder
+      | SCall ("initialize_floats", [e]) ->
+        let initialize_floats_external_func = L.declare_function "initialize_floats" (L.function_type float_arr_t [|i32_t|]) the_module in
+        L.build_call initialize_floats_external_func [| expr builder e |] "initialize_floats_llvm" builder
+      | SCall ("initialize_ints", [e]) ->
+        let initialize_ints_external_func = L.declare_function "initialize_ints" (L.function_type int_arr_t [|i32_t|]) the_module in
+        L.build_call initialize_ints_external_func [| expr builder e |] "initialize_ints_llvm" builder
       | SCall ("int_to_float", [e]) ->
         let int_to_float_external_func = L.declare_function "int_to_float" (L.function_type float_t [|i32_t|]) the_module in
         L.build_call int_to_float_external_func [| expr builder e |] "int_to_float_llvm" builder
@@ -433,29 +433,17 @@ let translate (globals, functions) =
       | SCall ("plot", [e1;e2]) ->
         let e1' = expr builder e1 in
         let e2' = expr builder e2 in
-        let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_t; string_t|]) the_module in
-        L.build_call plot_external_func [| e1'; e2' |] "plot_llvm" builder
+        let len_e1 = L.const_int i32_t (list_length e1) in
+        let plot_external_func = L.declare_function "plot" (L.function_type i32_t [|poly_arr_t; i32_t; string_t|]) the_module in
+        L.build_call plot_external_func [| e1'; len_e1; e2' |] "plot_llvm" builder
       | SCall ("range_plot", [e1;e2;e3;e4]) ->
         let e1' = expr builder e1 in
         let e2' = expr builder e2 in
         let e3' = expr builder e3 in
         let e4' = expr builder e4 in
-        let range_plot_external_func = L.declare_function "range_plot" (L.function_type i32_t [|poly_t; float_t; float_t; string_t|]) the_module in
-        L.build_call range_plot_external_func [| e1'; e2'; e3'; e4' |] "range_plot_llvm" builder
-      | SCall ("plot_many", [e1;e2]) ->
-        let e1' = expr builder e1 in
-        let e2' = expr builder e2 in
         let len_e1 = L.const_int i32_t (list_length e1) in
-        let plot_many_external_func = L.declare_function "plot_many" (L.function_type i32_t [|poly_arr_t; i32_t; string_t|]) the_module in
-        L.build_call plot_many_external_func [| e1'; len_e1; e2' |] "plot_many_llvm" builder
-      | SCall ("range_plot_many", [e1;e2;e3;e4]) ->
-        let e1' = expr builder e1 in
-        let e2' = expr builder e2 in
-        let e3' = expr builder e3 in
-        let e4' = expr builder e4 in
-        let len_e1 = L.const_int i32_t (list_length e1) in
-        let range_plot_many_external_func = L.declare_function "range_plot_many" (L.function_type i32_t [|poly_arr_t; i32_t; float_t; float_t; string_t|]) the_module in
-        L.build_call range_plot_many_external_func [| e1'; len_e1; e2'; e3'; e4' |] "range_plot_many_llvm" builder
+        let range_plot_external_func = L.declare_function "range_plot" (L.function_type i32_t [|poly_arr_t; i32_t; float_t; float_t; string_t|]) the_module in
+        L.build_call range_plot_external_func [| e1'; len_e1; e2'; e3'; e4' |] "range_plot_llvm" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

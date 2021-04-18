@@ -99,7 +99,9 @@ def int main()
   float x1;
   float x2;
   float err;
+  int return_code;
   float[] derivative_values;
+
   poly_derivative_exps = initialize_ints(2);
   
   poly_original = new_poly([3.1, 10.0, 4.0], [2, 1, 0], 3);
@@ -123,6 +125,11 @@ def int main()
   
   /* plot poly_original and poly_derivative together */
 
+  return_code = range_plot([ poly_original, poly_derivative ], x1, x2, "plotting/complexprogram_plot.png");
+
+  if ( return_code == 0 ) {
+    printstr("Plotted polynomial and derivative successfully.");
+  }
 
   /* calculate average slope of poly_original in range x1, x2 */
   average_slope = slope(x1, poly_original @ x1, x2, poly_original @ x2);

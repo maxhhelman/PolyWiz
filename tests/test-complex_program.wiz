@@ -120,8 +120,8 @@ def int main()
   poly_derivative = new_poly(poly_derivative_consts, poly_derivative_exps, poly_original_order);
   printstr(to_str(poly_derivative));
 
-  x1 = -5.0;
-  x2 = 5.0;
+  x1 = -7.0;
+  x2 = 7.0;
   
   /* plot poly_original and poly_derivative together */
 

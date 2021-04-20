@@ -152,9 +152,10 @@ let check (globals, functions) =
       | ArrAssignInd(e1, ind, e) as ex ->
           let (lt_arr, _) = expr e1 in
           let lt = (match lt_arr with
-              Array(Int) -> Int
-            | Array(Float) -> Float
-            | _ -> raise (Failure ("This array type does not support index assignment."))
+             Array(Int) -> Int
+            |Array(Float) -> Float
+            |Array(Bool) -> Bool
+            |_ -> raise (Failure ("This array type does not index assignment."))
           ) in
           let (rt, e') = expr e in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
@@ -198,6 +199,7 @@ let check (globals, functions) =
           | Ele_at_ind -> (match t1 with
                 Array(Int) -> Int
               | Array(Float) -> Float
+              | Array(Bool) -> Bool
               | _ -> raise (Failure ("This array type does not support indexing."))
             )
           | _ -> raise (

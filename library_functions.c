@@ -533,6 +533,10 @@ int arr_at_ind_i(int *arr, int ind) {
 double arr_at_ind_f(double *arr, int ind) {
   return arr[ind];
 }
+//get bool array element at ind
+bool arr_at_ind_b(bool *arr, int ind) {
+  return arr[ind];
+}
 
 //set array value at ind for float arrays
 double* set_arr_at_ind_f(double *arr, double el, int ind) {
@@ -541,6 +545,11 @@ double* set_arr_at_ind_f(double *arr, double el, int ind) {
 }
 //set array value at ind for int arrays
 int* set_arr_at_ind_i(int *arr, int el, int ind) {
+  arr[ind] = el;
+  return arr;
+}
+//set array value at ind for bool arrays
+bool* set_arr_at_ind_b(bool *arr, bool el, int ind) {
   arr[ind] = el;
   return arr;
 }

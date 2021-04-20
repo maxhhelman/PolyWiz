@@ -42,7 +42,6 @@ let translate (globals, functions) =
   (* array types *)
   let float_arr_t = L.pointer_type float_t in
   let int_arr_t = L.pointer_type i32_t in
-  let bool_arr_t = L.pointer_type i1_t in
   let string_arr_t = L.pointer_type string_t in
   let poly_arr_t = L.pointer_type poly_t in
 
@@ -96,12 +95,6 @@ let translate (globals, functions) =
     in
 
     arr
-  in
-
- let index_array arr ind assign builder =
-    let _val = L.build_gep (L.build_load arr "tmp" builder) [| (L.build_add ind (ci 1) "tmp" builder) |]
-     "tmp" builder in
-    if assign then _val else L.build_load _val "tmp" builder
   in
 
   let list_length e =
@@ -224,6 +217,7 @@ let translate (globals, functions) =
                 let set_arr_at_ind_i_external_func = L.declare_function "set_arr_at_ind_i" (L.function_type int_arr_t [|int_arr_t; i32_t; i32_t|]) the_module in
                 let new_arr = L.build_call set_arr_at_ind_i_external_func [|arr; e'; ind_llvm|] "set_arr_at_ind_i_llvm" builder in
                 L.build_store new_arr (lookup arrName) builder
+              | _ -> raise (Failure ("This array type does not support index assignment."))
             )
           ); e'
       | SAssign (s, e) -> let e' = expr builder e in
@@ -275,7 +269,9 @@ let translate (globals, functions) =
           | A.Float -> 
               let arr_at_ind_f_external_func = L.declare_function "arr_at_ind_f" (L.function_type float_t [|float_arr_t;i32_t|]) the_module in
               L.build_call arr_at_ind_f_external_func [| e1'; e2' |] "arr_at_ind_f_llvm" builder
+          | _ -> raise (Failure ("This array type does not support indexing."))
       )
+      | _ -> raise (Failure ("This operation is invalid for array and int operands."))
     )
 
       | SBinop (((A.Float,_ ) as e1), op, ((A.Float,_ ) as e2)) -> (* Binary op where e1 (float), e2 (float) *)
@@ -390,7 +386,6 @@ let translate (globals, functions) =
     | A.Abs                  ->
       let abs_external_func_ints = L.declare_function "abs_operator_int" (L.function_type i32_t [|i32_t|]) the_module in
       L.build_call abs_external_func_ints [| e' |] "abs_operator_int_llvm" builder
-    | _ -> raise (Failure "This operation is invalid for these operands.")
     )
       | SCall ("printint", [e]) | SCall ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]

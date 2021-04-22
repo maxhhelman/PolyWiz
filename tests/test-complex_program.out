@@ -1,4 +1,21 @@
-3.100000x^2+10.000000x+4.000000
-+6.200000x+10.000000
-Plotted polynomial and derivative successfully.
-The Mean Value Theorem holds!
+\documentclass{article}
+\usepackage{graphicx}
+\begin{document}
+\begin{figure}[h]
+\centering
+\includegraphics[width=4in]{polywizard.png}
+\label{fig_sim}
+\end{figure}
+Every time I read a LaTeX document, I think, wow, this must be correct! - Prof. Christos Papadimitriou \\
+So, let's prove the MVT with Proof By LaTeX and PolyWiz. Consider the polynomial:
+$$3.100000x^{2}+10.000000x+4.000000$$
+Also, consider its derivative:
+$$+6.200000x+10.000000$$
+Now, let's plot them both:
+\begin{figure}[h]
+\centering
+\includegraphics[width=4in]{complexprogram_plot.png}
+\label{fig_sim}
+\end{figure}
+And, as you can observe, the MVT holds! QED via LaTeX and PolyWiz
+\end{document}

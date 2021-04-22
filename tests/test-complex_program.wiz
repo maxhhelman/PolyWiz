@@ -102,11 +102,24 @@ def int main()
   int return_code;
   float[] derivative_values;
 
+  /* LaTeX Stuff */
+  string[] body;
+  string text1;
+  string text2;
+  string text3;
+  string text4;
+  string text5;
+  string poly_original_string;
+  string poly_derivative_string;
+  string fp1;
+  string fp2;
+  string tdoc;
+
   poly_derivative_exps = initialize_ints(2);
   
   poly_original = new_poly([3.1, 10.0, 4.0], [2, 1, 0], 3);
   poly_original_order = order(poly_original);
-  printstr(to_str(poly_original));
+  poly_original_string = print_tex(poly_original);
   
   consts_arr = poly_original#;
   
@@ -118,18 +131,14 @@ def int main()
   }
 
   poly_derivative = new_poly(poly_derivative_consts, poly_derivative_exps, poly_original_order);
-  printstr(to_str(poly_derivative));
+  poly_derivative_string = print_tex(poly_derivative);
 
   x1 = -7.0;
   x2 = 7.0;
   
   /* plot poly_original and poly_derivative together */
 
-  return_code = range_plot([ poly_original, poly_derivative ], x1, x2, "plotting/complexprogram_plot.png");
-
-  if ( return_code == 0 ) {
-    printstr("Plotted polynomial and derivative successfully.");
-  }
+  return_code = range_plot([ poly_original, poly_derivative ], x1, x2, "complexprogram_plot.png");
 
   /* calculate average slope of poly_original in range x1, x2 */
   average_slope = slope(x1, poly_original @ x1, x2, poly_original @ x2);
@@ -140,7 +149,19 @@ def int main()
   err = 0.3;
   /* if slope is in poly_derivative's values by margin of err */
   if( approx_in(average_slope, derivative_values, 1000, err) ){
-    printstr("The Mean Value Theorem holds!");
+
+    text1 = "Every time I read a LaTeX document, I think, wow, this must be correct! - Prof. Christos Papadimitriou";
+    text2 = "So, let's prove the MVT with Proof By LaTeX and PolyWiz. Consider the polynomial:";
+    text3 = "Also, consider its derivative:";
+    text4 = "Now, let's plot them both:";
+    text5 = "And, as you can observe, the MVT holds! QED via LaTeX and PolyWiz";
+    fp1 = "polywizard.png";
+    fp2 = "complexprogram_plot.png";
+
+    body = [fp1, text1, text2, poly_original_string, text3, poly_derivative_string, text4, fp2, text5];
+
+    tdoc = (tex_document(body, [0,7]));
+    printstr(tdoc);
   }
 
   return 0;

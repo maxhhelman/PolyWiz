@@ -370,7 +370,7 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   //print header
   texdoc_str_ind += sprintf(texdoc_str_ind, "%s", header);
 
-  for(int i = 0; i < num_elems+2; i++){
+  for(int i = 0; i < num_elems+10; i++){
     int isimg = 0;
 
     //check if it is an image
@@ -381,12 +381,12 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
         }
     }
     //handle non-image case
-    if(isimg == 0){
+    if(texdocbody[i] && isimg == 0){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s", texdocbody[i]);
     }
 
     //handle image case
-    else if(isimg == 1){
+    else if(isimg == 1 && imgindices[0] != -1){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s%s%s", imgheader, texdocbody[i], imgfooter);
     }
 

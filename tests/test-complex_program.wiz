@@ -150,7 +150,7 @@ def int main()
   /* if slope is in poly_derivative's values by margin of err */
   if( approx_in(average_slope, derivative_values, 1000, err) ){
 
-    text1 = "Every time I read a LaTeX document, I think, wow, this must be correct! - Prof. Christos Papadimitriou";
+    text1 = "Every time I read a LaTeX document, I think, wow, this must be correct! - Prof. Christos Papadimitriou \\";
     text2 = "So, let's prove the MVT with Proof By LaTeX and PolyWiz. Consider the polynomial:";
     text3 = "Also, consider its derivative:";
     text4 = "Now, let's plot them both:";

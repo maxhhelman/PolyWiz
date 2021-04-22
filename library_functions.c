@@ -323,7 +323,7 @@ char* poly_to_tex(double *poly){
   poly_str_ind += sprintf(poly_str_ind, "$$");
 
   for (int i = poly_order; i>=0; i--){
-    if(poly[i]==0.0)
+    if(poly[i] == 0.0 || !poly[i])
       continue;
 
     //order 0 poly
@@ -364,7 +364,7 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   }
 
   //now, actually make the string
-  char *texdoc_str = malloc(len + 100);
+  char *texdoc_str = malloc(len * 512);
   char *texdoc_str_ind = texdoc_str;
 
   //print header
@@ -382,7 +382,12 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
     }
     //handle non-image case
     if(texdocbody[i] && isimg == 0){
-        texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s", texdocbody[i]);
+        char* s1 = texdocbody[i];
+        texdoc_str_ind += sprintf(texdoc_str_ind, "\n");
+        while(*s1){
+          texdoc_str_ind += sprintf(texdoc_str_ind, "%c", *s1);
+          s1 = s1 + 1;
+        }
     }
 
     //handle image case

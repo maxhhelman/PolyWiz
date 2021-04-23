@@ -359,18 +359,22 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   //find length of everything
   int len = strlen(header) + strlen(footer) + ((sizeof(imgindices)/sizeof(int)) * (strlen(imgheader) + strlen(imgfooter))) + sizeof(texdocbody);
   int num_elems = sizeof(texdocbody)/sizeof(*texdocbody);
-  for(int i = 0; i < num_elems; i++) {
-    len = len + strlen(texdocbody[i]) + 2;
+
+  int j = 0;
+  while(texdocbody[j]){
+    len = len + strlen(texdocbody[j]) + 2;
+    j = j + 1;
   }
 
   //now, actually make the string
-  char *texdoc_str = malloc(len * 512);
+  char *texdoc_str = malloc(len + 100);
   char *texdoc_str_ind = texdoc_str;
 
   //print header
   texdoc_str_ind += sprintf(texdoc_str_ind, "%s", header);
 
-  for(int i = 0; i < num_elems+10; i++){
+  int i = 0;
+  while(texdocbody[i]){
     int isimg = 0;
 
     //check if it is an image
@@ -394,7 +398,7 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
     else if(isimg == 1 && imgindices[0] != -1){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s%s%s", imgheader, texdocbody[i], imgfooter);
     }
-
+    i = i + 1;
   }
 
   //print footer

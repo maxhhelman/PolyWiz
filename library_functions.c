@@ -353,7 +353,7 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
   char footer[] = "\n\\end{document}";
 
   //header and footer to wrap filepath of image
-  char imgheader[] = "\\begin{figure}[h]\n\\centering\n\\includegraphics[width=4in]{";
+  char imgheader[] = "\\begin{figure}[h]\n\\centering\n\\includegraphics[width=2.5in]{";
   char imgfooter[] = "}\n\\label{fig_sim}\n\\end{figure}";
 
   //find length of everything
@@ -392,12 +392,14 @@ char* generate_texdoc(char **texdocbody, int *imgindices){
           texdoc_str_ind += sprintf(texdoc_str_ind, "%c", *s1);
           s1 = s1 + 1;
         }
+        texdoc_str_ind += sprintf(texdoc_str_ind, "\\\\");
     }
 
     //handle image case
     else if(isimg == 1 && imgindices[0] != -1){
         texdoc_str_ind += sprintf(texdoc_str_ind, "\n%s%s%s", imgheader, texdocbody[i], imgfooter);
     }
+    isimg = 0;
     i = i + 1;
   }
 

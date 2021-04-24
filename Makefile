@@ -30,8 +30,6 @@ clean :
 
 # Testing the "library_functions" example
 library_functions : library_functions.o
-	apt-get update
-	apt-get -yq --no-install-suggests --no-install-recommends install gnuplot
 	gcc -o library_functions library_functions.c -DBUILD_TEST -lm
 
 # Building the tarball

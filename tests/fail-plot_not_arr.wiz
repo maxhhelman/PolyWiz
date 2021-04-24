@@ -8,7 +8,7 @@ def int main()
   poly2 = new_poly([7.0, 4.0], [1, 0]);
   poly_product = poly1 * poly2;
 
-  printint(plot(poly_product, "plotting/plot_single.png"));
+  printint(plot(poly_product, "plots/plot_single.png"));
 
   return 0;
 }

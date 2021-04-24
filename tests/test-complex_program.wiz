@@ -138,7 +138,7 @@ def int main()
   
   /* plot poly_original and poly_derivative together */
 
-  return_code = range_plot([ poly_original, poly_derivative ], x1, x2, "complexprogram_plot.png");
+  return_code = range_plot([ poly_original, poly_derivative ], x1, x2, "plots/complexprogram_plot.png");
 
   /* calculate average slope of poly_original in range x1, x2 */
   average_slope = slope(x1, poly_original @ x1, x2, poly_original @ x2);
@@ -156,7 +156,7 @@ def int main()
     text4 = "Now, let's plot them both:";
     text5 = "And, as you can observe, the MVT holds! QED via LaTeX and PolyWiz";
     fp1 = "polywizard.png";
-    fp2 = "complexprogram_plot.png";
+    fp2 = "plots/complexprogram_plot.png";
 
     body = [fp1, text1, text2, poly_original_string, text3, poly_derivative_string, text4, fp2, text5];
 

@@ -1,5 +1,3 @@
-/* Bug noticed by Pin-Chin Huang */
-
 def int fun(int x, int y)
 {
   return 0;

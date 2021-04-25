@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Swift compilation script for PolyWiz
+
+# Path to the LLVM interpreter
+LLI="lli"
+#LLI="/usr/local/opt/llvm/bin/lli"
+
+# Path to the LLVM compiler
+LLC="llc"
+
+# Path to the C compiler
+CC="cc"
+
+# Path to the polywiz compiler.  Usually "./polywiz.native"
+# Try "_build/polywiz.native" if ocamlbuild was unable to create a symbolic link.
+POLYWIZ="./polywiz.native"
+#POLYWIZ="_build/polywiz.native"
+
+# Set time limit for all operations
+ulimit -t 30
+
+inputfile=${1}
+outputfile=${2}
+
+Run() {
+    echo $* 1>&2
+    eval $* || {
+    SignalError "$1 failed on $*"
+    return 1
+    }
+}
+
+Usage() {
+    echo "Usage: ./enchant [source_code.wiz] [output filename]"
+    echo "-h    Print help"
+    exit 1
+}
+
+while getopts kdpsh c; do
+    case $c in
+    h) # Help
+        Usage
+        ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+basename=`echo $1 | sed 's/.*\\///
+                        s/.wiz//'`
+
+generatedfiles="${basename}.ll ${basename}.s"
+
+Run "$POLYWIZ" "$inputfile" ">" "${basename}.ll" &&
+Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
+Run "$CC" "-o" "$outputfile" "${basename}.s" "library_functions.o -lm"
+Run "rm -f $generatedfiles"
+
+exit $globalerror

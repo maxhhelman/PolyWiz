@@ -51,7 +51,7 @@ TESTFILES = $(TESTS:%=test-%.pwiz) $(TESTS:%=test-%.out) \
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags polywiz.ml polywizparse.mly \
 	README scanner.mll semant.ml testall.sh \
-	library_functions.c arcade-font.pbm font2c \
+	library_functions.c \
 	Dockerfile \
 	$(TESTFILES:%=tests/%)
 

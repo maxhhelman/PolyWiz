@@ -129,6 +129,41 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    let array_type l' = 
+      let array_type = (List.nth l' 0) in
+      match array_type with
+        (Int,_) -> (Array(Int), SArrayLit l')
+      | (Float,_) -> (Array(Float), SArrayLit l')
+      | (Bool,_) -> (Array(Bool), SArrayLit  l')
+      | (String,_) -> (Array(String), SArrayLit l')
+      | (Poly,_) -> (Array(Poly), SArrayLit l')
+      |  _ ->  raise (Failure ("not a valid array type"))
+    in 
+
+    let rec check_array arr arr_type=
+      match arr with 
+      [] -> true
+    | [x] -> ((string_of_typ x) = arr_type)
+    | x::y -> ((string_of_typ x) = arr_type) && (check_array y arr_type)
+    in
+
+    let array_typ t = 
+      let array_type = (List.nth t 0) in
+      match array_type with
+        (Int,_) -> "int"
+      | (Float,_) -> "float"
+      | (Bool,_) -> "bool"
+      | (String,_) -> "string"
+      | (Poly,_) -> "poly"
+      |  _ ->  raise (Failure ("not a valid array type"))
+    in 
+
+    let check_array_helper arr = 
+      match arr with 
+      [] -> true 
+    | [_] -> true 
+    | x::y -> check_array arr (array_typ arr) in
+
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr = function
         Literal  l -> (Int, SLiteral l)
@@ -136,17 +171,14 @@ let check (globals, functions) =
       | BoolLit l  -> (Bool, SBoolLit l)
       | Sliteral l -> (String, SSliteral l)
       | ArrayLit l ->
-      if List.length l > 0 then
-          let l' = List.map expr l in
-          let array_type = (List.nth l' 0) in
-          match array_type with
-            (Int,_) -> (Array(Int), SArrayLit l')
-          | (Float,_) -> (Array(Float), SArrayLit l')
-          | (Bool,_) -> (Array(Bool), SArrayLit  l')
-          | (String,_) -> (Array(String), SArrayLit l')
-          | (Poly,_) -> (Array(Poly), SArrayLit l')
-          |  _ ->  raise (Failure ("not a valid array type"))
-      else (Void, SArrayLit([]))
+      let l' = List.map expr l in 
+        (match l with 
+          [] -> (Void, SArrayLit([]))
+        | [_] -> array_type (List.map expr l) 
+        | x -> 
+        (match (check_array_helper (List.map expr x)) with 
+          true -> array_type (List.map expr x) 
+        | false -> raise(Failure("This list has multiple types."))))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | ArrAssignInd(e1, ind, e) as ex ->

@@ -50,7 +50,7 @@ TESTFILES = $(TESTS:%=test-%.pwiz) $(TESTS:%=test-%.out) \
 	    $(FAILS:%=fail-%.pwiz) $(FAILS:%=fail-%.err)
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags polywiz.ml polywizparse.mly \
-	README scanner.mll semant.ml testall.sh \
+	README scanner.mll semant.ml testall.sh enchant \
 	library_functions.c \
 	Dockerfile \
 	$(TESTFILES:%=tests/%)

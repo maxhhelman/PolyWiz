@@ -184,7 +184,6 @@ do
     case $file in
 	*test-*)
 	    Check $file 2>> $globallog
-        echo Check $file 2
 	    ;;
 	*fail-*)
 	    CheckFail $file 2>> $globallog

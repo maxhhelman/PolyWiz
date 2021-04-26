@@ -1,0 +1,11 @@
+def int main()
+{
+  int i;
+  i = 3;
+  if (i > 5) {
+    printint(1);
+  } else {
+    printint(8);
+  }
+  return 0;
+}

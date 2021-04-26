@@ -60,61 +60,37 @@ let translate (globals, functions) =
   (* Array creation, initialization, indexing
      Note: Beets (2017) was very helpful here since their arrays are similar to ours
      So we'd like to cite their code for this part*)
-  let ci = L.const_int i32_t
-    in
+  let ci = L.const_int i32_t in
   let new_arr t len builder =
     let s_tot = L.build_add (L.build_mul (L.build_intcast
      (L.size_of (ltype_of_typ t)) i32_t "tmp" builder)
-     len "tmp" builder) (ci 1) "tmp" builder
-     in
+     len "tmp" builder) (ci 1) "tmp" builder in
     let arr = L.build_pointercast (L.build_array_malloc (ltype_of_typ t) s_tot "tmp" builder)
-     (L.pointer_type (ltype_of_typ t)) "tmp" builder
-     in
-    arr
-  in
+     (L.pointer_type (ltype_of_typ t)) "tmp" builder in
+    arr in
 
   let instantiate_arr t elems builder =
     let arr = new_arr t
-     (ci (List.length elems)) builder
-      in
+     (ci (List.length elems)) builder in
     let _ =
       let assign_value i =
         let ind = L.build_add (ci i)
-         (ci 0) "tmp" builder
-         in
+         (ci 0) "tmp" builder in
         L.build_store (List.nth elems i)
-         (L.build_gep arr [| ind |] "tmp" builder) builder
-      in
-      let n = ((List.length elems)-1)
-      in
+         (L.build_gep arr [| ind |] "tmp" builder) builder in
+      let n = ((List.length elems)-1) in
         let rec rec_count cnt =
-          (* I know if else is terrible style. It was being hissy on pattern matching *)
           if cnt = n then ignore (assign_value cnt)
-          else (ignore (assign_value cnt); rec_count (cnt+1))
-        in
-        rec_count 0
-    in
+          else (ignore (assign_value cnt); rec_count (cnt+1)) in
+        rec_count 0 in
 
-    arr
-  in
+    arr in
 
   let list_length e =
     (match e with
       (_, SArrayLit(l)) -> List.length l
       | _ -> 0
     ) in
-  (*
-  let int_list_ele e ind =
-    (match e with
-      (A.Array(t), SArrayLit(l)) ->
-        let l0=List.nth l ind in
-        (match l0 with
-          (A.Int, SLiteral(inte)) -> inte
-          | _ -> 0
-        )
-      | _ -> 0
-    ) in
-  *)
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -129,13 +105,6 @@ let translate (globals, functions) =
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
-    (* Print strings *)
-  (*
-  let printstr_t : L.lltype =
-      L.function_type string_t [| L.pointer_type i8_t |] in
-  let printstr_func : L.llvalue =
-      L.declare_function "printstr" printstr_t the_module in
-  *)
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
